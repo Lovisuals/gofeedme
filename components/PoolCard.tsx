@@ -42,7 +42,7 @@ export default function PoolCard({ pool }: PoolCardProps) {
               <span className="font-medium">{pool.slotsFilled}/{pool.slotsTotal} slots</span>
               <span className="font-medium text-primary">{percent}%</span>
             </div>
-            <Progress value={percent} className="h-2 bg-gray-200" indicatorClassName="bg-primary" />
+            <Progress value={percent} className="h-2 [&>div]:bg-primary" /> {/* Tailwind override for fill color */}
           </div>
 
           {/* Price */}
