@@ -4,7 +4,7 @@ import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 
 export async function getActivePools() {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();  // Await to resolve the Promise
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
