@@ -1,38 +1,38 @@
-# Updated Locked Project Structure (Template-Based)
+# Locked Project Structure - Template Adapted Version
 
-Original intent preserved, but adapted to Vercel/Supabase official template (shadcn/ui, auth pages, protected routes).
+Base: Official Vercel + Supabase Starter (shadcn/ui, auth pages, protected route)
 
-Current structure (from template + planned additions):
+Additions planned for GoFeedMe:
+- Custom Navbar, PoolCard, PaymentModal, RedemptionInput
+- Routes: create/, pools/[id]/
+- Server actions for pools/OTP
+
+Current structure (as of Jan 14, 2026):
 
 ├── app
-│   ├── auth/                  # Template auth pages (login, sign-up, etc.)
-│   ├── protected/             # Template protected example → rename to dashboard later?
+│   ├── auth/                  # Full auth pages (login, sign-up, etc.) – keep
+│   ├── protected/             # Protected example – consider rename to dashboard/
 │   ├── layout.tsx
-│   ├── page.tsx               # Homepage (customize to GFM hero)
+│   ├── page.tsx               # Homepage – customize to GFM hero/grid
 │   ├── globals.css
-│   ├── create/                # To add: pool wizard
-│   │   └── page.tsx
-│   └── pools/                 # To add: dynamic pool detail
-│       └── [id]/
-│           └── page.tsx
+│   ├── favicon.ico
+│   └── ... (opengraph, twitter images)
 ├── components
-│   ├── ui/                    # shadcn/ui (button, card, etc.) – keep!
-│   ├── Navbar.tsx             # Custom GFM navbar (to add)
-│   ├── PoolCard.tsx           # Custom pool card (to add)
-│   ├── PaymentModal.tsx       # Custom (to add)
-│   ├── RedemptionInput.tsx    # Custom OTP (to add)
-│   └── ...                    # Template components (hero, auth-button, etc.)
+│   ├── ui/                    # shadcn/ui components – keep & use heavily
+│   ├── hero.tsx               # Template – inspiration for homepage
+│   ├── auth-button.tsx, etc.  # Template auth UI – keep useful
+│   ├── Navbar.tsx             # Custom – to add
+│   ├── PoolCard.tsx           # Custom – to add
+│   └── ...                    # Add PaymentModal, RedemptionInput later
 ├── lib
-│   ├── supabase/              # Template helpers (client.ts, server.ts)
-│   ├── utils.ts
-│   └── actions.ts             # Our server actions (to add/merge)
-├── types/
-│   └── index.ts               # To add for shared types
-├── .env.local.example
-├── tailwind.config.ts         # Customize for #02a95c green
+│   ├── supabase/              # client.ts, server.ts – keep
+│   └── utils.ts               # Keep & extend
+├── types/                     # To add (index.ts for Pool types)
+├── .env.local.example         # Supabase vars
+├── tailwind.config.ts         # Customize next for green palette
 ├── next.config.ts
 ├── package.json
-└── README.md                  # Template README – update with our project info
+└── README.md                  # Update with project info
 
-Rule: Before structural changes, update this file.
-Locked version: January 14, 2026 (template-adapted)
+Rule: Update this file before structural changes.
+Locked version: Template-adapted, January 14, 2026
