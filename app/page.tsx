@@ -5,7 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { ShieldCheck, Zap, Users, ArrowRight } from 'lucide-react';
 import { getActivePools } from '@/lib/actions';
 
-export const dynamic = 'force-dynamic'; // Ensure server fetch on each request
+// Removed 'force-dynamic' to avoid caching conflict – page is static by default, but fetch is server-side
 
 export default async function Home() {
   const pools = await getActivePools();
