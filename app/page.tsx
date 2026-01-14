@@ -1,122 +1,118 @@
+import Navbar from '@/components/Navbar';
+import PoolCard from '@/components/PoolCard';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ShieldCheck, Zap, Users, Wheat, Beef, Sprout, ArrowRight } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
+import { ShieldCheck, Zap, Users, ArrowRight } from 'lucide-react';
+
+// Mock data for demo - replace with real Supabase fetch later
+const MOCK_POOLS = [
+  {
+    id: '1',
+    title: 'Bulk 50kg Rice for Lagos Coop',
+    image: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&q=80',
+    total: 85000,
+    raised: 51000,
+    slotsTotal: 10,
+    slotsFilled: 6,
+    location: 'Ikeja, Lagos',
+    timeLeft: '2 days left',
+  },
+  {
+    id: '2',
+    title: 'Shared Tractor Rental - Ogun Farmers',
+    image: 'https://images.unsplash.com/photo-1601598851540-6e636c7a493e?auto=format&fit=crop&q=80',
+    total: 250000,
+    raised: 100000,
+    slotsTotal: 5,
+    slotsFilled: 2,
+    location: 'Abeokuta',
+    timeLeft: '1 week',
+  },
+  {
+    id: '3',
+    title: 'Community Yam Harvest Pool',
+    image: 'https://images.unsplash.com/photo-1601039641847-9b9a45a2f6d4?auto=format&fit=crop&q=80',
+    total: 120000,
+    raised: 120000,
+    slotsTotal: 12,
+    slotsFilled: 12,
+    location: 'Benin City',
+    timeLeft: 'Completed',
+  },
+];
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-gray-50">
-      {/* Hero Section */}
-      <section className="relative pt-24 pb-20 md:pt-32 overflow-hidden bg-white">
-        {/* Floating Bubbles (food/farm images) */}
-        <div className="hidden lg:block absolute inset-0 pointer-events-none opacity-80">
-          <img
-            src="https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=200"
-            alt="Rice bag"
-            className="absolute top-20 left-[15%] w-32 h-32 rounded-full object-cover shadow-float animate-bounce-slow"
-            style={{ animationDuration: '4s' }}
-          />
-          <img
-            src="https://images.unsplash.com/photo-1541447233767-f01878d6b7b2?auto=format&fit=crop&w=200"
-            alt="Livestock"
-            className="absolute bottom-16 right-[20%] w-28 h-28 rounded-full object-cover shadow-float animate-bounce-slow"
-            style={{ animationDuration: '5s' }}
-          />
-          <img
-            src="https://images.unsplash.com/photo-1610450918386-0925c4046462?auto=format&fit=crop&w=200"
-            alt="Tubers"
-            className="absolute top-40 right-[10%] w-24 h-24 rounded-full object-cover shadow-float animate-bounce-slow"
-            style={{ animationDuration: '3.5s' }}
-          />
-        </div>
+    <div className="min-h-screen bg-gray-50">
+      <Navbar />
 
-        <div className="relative z-10 max-w-4xl mx-auto px-6 text-center">
-          <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
-            Successful Food & Farm Pools
-            <br />
-            <span className="text-primary">Start Here</span>
+      {/* Hero - Simplified for now, expand later */}
+      <section className="relative pt-24 pb-16 bg-white">
+        <div className="max-w-4xl mx-auto px-6 text-center">
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+            Pool Resources, Eat Better, Farm Smarter
           </h1>
-          <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-            Pool resources with others for bulk food, farming tools, or harvests. Escrow-protected, discounts unlocked, community-driven.
+          <p className="text-xl text-gray-600 mb-8">
+            Join or start food & farming pools. Bulk discounts, escrow safety, community power.
           </p>
-          <Button size="lg" className="bg-primary hover:bg-primary-hover text-white px-10 py-6 text-lg font-bold rounded-lg shadow-lg">
+          <Button size="lg" className="bg-primary hover:bg-primary-hover text-white px-10 py-6 text-lg">
             Start a Pool
           </Button>
-          <p className="mt-6 text-sm text-gray-500 flex items-center justify-center gap-2">
-            <ShieldCheck className="h-5 w-5 text-primary" />
-            Funds held safely until delivery
-          </p>
         </div>
       </section>
 
       {/* Trust Bar */}
-      <section className="py-12 border-y border-gray-100 bg-white">
+      <section className="py-12 border-y bg-white">
         <div className="max-w-5xl mx-auto px-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
             <div>
               <Zap className="h-10 w-10 mx-auto mb-4 text-primary" />
-              <h3 className="font-bold text-lg mb-2">Fast & Easy</h3>
-              <p className="text-gray-600">Create a pool in minutes</p>
+              <h3 className="font-bold text-lg">Fast & Easy</h3>
+              <p className="text-gray-600">Pool in minutes</p>
             </div>
             <div>
               <ShieldCheck className="h-10 w-10 mx-auto mb-4 text-primary" />
-              <h3 className="font-bold text-lg mb-2">100% Guaranteed</h3>
-              <p className="text-gray-600">Escrow protection</p>
+              <h3 className="font-bold text-lg">Guaranteed Safe</h3>
+              <p className="text-gray-600">Escrow holds funds</p>
             </div>
             <div>
               <Users className="h-10 w-10 mx-auto mb-4 text-primary" />
-              <h3 className="font-bold text-lg mb-2">Community Trust</h3>
+              <h3 className="font-bold text-lg">Community Powered</h3>
               <p className="text-gray-600">Verified participants</p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Categories */}
-      <section className="py-16 bg-gray-50">
-        <div className="max-w-6xl mx-auto px-6">
-          <h2 className="text-3xl font-bold text-center mb-12">Discover by Category</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {[
-              { icon: Wheat, title: 'Staples' },
-              { icon: Beef, title: 'Proteins' },
-              { icon: Sprout, title: 'Fresh Produce' },
-              { icon: Users, title: 'Community Harvest' },
-            ].map((cat, i) => (
-              <Card key={i} className="text-center hover:shadow-md transition-shadow cursor-pointer">
-                <CardContent className="pt-6">
-                  <div className="w-16 h-16 mx-auto bg-primary/10 rounded-full flex items-center justify-center mb-4">
-                    <cat.icon className="h-8 w-8 text-primary" />
-                  </div>
-                  <h3 className="font-semibold">{cat.title}</h3>
-                </CardContent>
-              </Card>
+      {/* Active Pools Grid */}
+      <section className="py-16 max-w-6xl mx-auto px-6">
+        <div className="flex justify-between items-center mb-8">
+          <h2 className="text-3xl font-bold text-gray-900">Active Pools</h2>
+          <Button variant="outline" asChild>
+            <a href="/create">
+              Start New <ArrowRight className="ml-2 h-4 w-4" />
+            </a>
+          </Button>
+        </div>
+
+        {MOCK_POOLS.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {MOCK_POOLS.map((pool) => (
+              <PoolCard key={pool.id} pool={pool} />
             ))}
           </div>
-        </div>
+        ) : (
+          <Card className="p-12 text-center">
+            <CardContent>
+              <h3 className="text-xl font-semibold mb-4">No active pools yet</h3>
+              <p className="text-gray-600 mb-6">Be the first to start one!</p>
+              <Button asChild>
+                <a href="/create">Create Pool</a>
+              </Button>
+            </CardContent>
+          </Card>
+        )}
       </section>
-
-      {/* Active Pools Stub */}
-      <section className="py-16">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="flex justify-between items-center mb-8">
-            <h2 className="text-3xl font-bold">Active Pools</h2>
-            <Button variant="outline">View All <ArrowRight className="ml-2 h-4 w-4" /></Button>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Mock cards - replace with real data later */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Bulk Rice for Lagos Coop</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-gray-600">8/10 slots filled</p>
-                {/* Add progress bar later */}
-              </CardContent>
-            </Card>
-            {/* Add 2 more mock cards */}
-          </div>
-        </div>
-      </section>
-    </main>
+    </div>
   );
 }
