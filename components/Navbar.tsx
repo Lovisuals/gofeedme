@@ -8,45 +8,45 @@ import { Button } from '@/components/ui/button';
 
 export default function Navbar() {
   const [user, setUser] = useState<any>(null);
-  const [supabase, setSupabase] = useState<any>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [supabaseClient, setSupabaseClient] = useState<any>(null);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-      setError('Missing Supabase env vars');
-      return;
-    }
-
     try {
+      if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+        throw new Error('Missing Supabase environment variables');
+      }
+
       const client = createBrowserClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL,
         process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
       );
-      setSupabase(client);
+      setSupabaseClient(client);
 
-      const getUser = async () => {
+      const fetchUser = async () => {
         const { data } = await client.auth.getUser();
         setUser(data.user);
       };
-      getUser();
-    } catch (err) {
-      setError((err as Error).message);
+      fetchUser();
+    } catch (err: any) {
+      console.error('Navbar init error:', err);
+      setLoadError(err.message || 'Failed to initialize auth');
     }
   }, []);
 
-  if (error) {
-    console.error('Navbar Supabase error:', error);
-    // Fallback render - no crash
+  if (loadError) {
     return (
-      <nav className="bg-white fixed top-0 left-0 right-0 z-50 border-b">
-        <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between text-red-600">
-          GoFeedMe (Env Error: {error})
+      <nav className="bg-white fixed top-0 left-0 right-0 z-50 border-b border-red-200">
+        <div className="max-w-7xl mx-auto px-4 h-16 flex items-center text-red-600">
+          GoFeedMe – Error: {loadError} (check console & env vars)
         </div>
       </nav>
     );
   }
 
-  if (!supabase) return null; // Loading
+  if (!supabaseClient) {
+    return null; // Loading state
+  }
 
   return (
     <nav className="bg-white/95 backdrop-blur-sm fixed top-0 left-0 right-0 z-50 border-b border-gray-100">
@@ -78,7 +78,7 @@ export default function Navbar() {
             </Link>
           )}
 
-          <Button asChild className="bg-primary hover:bg-primary-hover">
+          <Button asChild className="bg-primary hover:bg-primary-hover text-white">
             <Link href="/create">Start a Pool</Link>
           </Button>
         </div>
