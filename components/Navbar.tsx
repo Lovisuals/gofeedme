@@ -4,23 +4,31 @@ import Link from 'next/link';
 import { Search, HeartHandshake } from 'lucide-react';
 import { createBrowserClient } from '@supabase/ssr';
 import { useEffect, useState } from 'react';
-import { Button } from '@/components/ui/button'; // shadcn/ui button
+import { Button } from '@/components/ui/button';
 
 export default function Navbar() {
   const [user, setUser] = useState<any>(null);
-
-  const supabase = createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
+  const [supabase, setSupabase] = useState<any>(null);
 
   useEffect(() => {
+    // Lazy init on client only
+    const client = createBrowserClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
+    setSupabase(client);
+
     const getUser = async () => {
-      const { data } = await supabase.auth.getUser();
-      setUser(data.user);
+      if (client) {
+        const { data } = await client.auth.getUser();
+        setUser(data.user);
+      }
     };
     getUser();
-  }, [supabase]);
+  }, []);
+
+  // Don't render auth-dependent parts until supabase is ready
+  if (!supabase) return null;
 
   return (
     <nav className="bg-white/95 backdrop-blur-sm fixed top-0 left-0 right-0 z-50 border-b border-gray-100">
@@ -34,7 +42,7 @@ export default function Navbar() {
           </span>
         </Link>
 
-        {/* Search (desktop) */}
+        {/* Search */}
         <div className="hidden md:flex flex-1 max-w-md mx-8 relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
           <input
