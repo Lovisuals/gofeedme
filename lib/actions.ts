@@ -5,7 +5,7 @@ import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
 export async function createPool(formData: FormData) {
-  const cookieStore = await cookies();
+  const cookieStore = await cookies();  // Await to resolve Promise type
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -32,7 +32,7 @@ export async function createPool(formData: FormData) {
   const { error } = await supabase.from('pools').insert([data]);
 
   if (error) {
-    console.error('Insert error:', error);
+    console.error('Supabase insert error:', error);
     return { error: error.message };
   }
 
@@ -40,7 +40,7 @@ export async function createPool(formData: FormData) {
 }
 
 export async function getActivePools() {
-  const cookieStore = await cookies();
+  const cookieStore = await cookies();  // Await to resolve Promise type
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -62,7 +62,7 @@ export async function getActivePools() {
     .limit(6);
 
   if (error) {
-    console.error('Fetch error:', error);
+    console.error('Supabase fetch error:', error);
     return [];
   }
 
