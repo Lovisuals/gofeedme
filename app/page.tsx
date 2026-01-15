@@ -4,12 +4,12 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { ShieldCheck, Zap, Users, ArrowRight } from 'lucide-react';
 
-// Mock data - replace with Supabase fetch later
+// Mock data - using image_url to match PoolCard props and Supabase
 const MOCK_POOLS = [
   {
     id: '1',
     title: '50kg Mama Gold Rice – Ikeja Market Group',
-    image: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&q=80',
+    image_url: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&q=80',
     total: 85000,
     raised: 51000,
     slotsTotal: 10,
@@ -20,7 +20,7 @@ const MOCK_POOLS = [
   {
     id: '2',
     title: 'Bulk Frozen Chicken – Family Pot for Weekend',
-    image: 'https://images.unsplash.com/photo-1541447233767-f01878d6b7b2?auto=format&fit=crop&q=80',
+    image_url: 'https://images.unsplash.com/photo-1541447233767-f01878d6b7b2?auto=format&fit=crop&q=80',
     total: 45000,
     raised: 22500,
     slotsTotal: 5,
@@ -31,7 +31,7 @@ const MOCK_POOLS = [
   {
     id: '3',
     title: 'Yam & Garri Bundle – Ogun Farmers Coop',
-    image: 'https://images.unsplash.com/photo-1601039641847-9b9a45a2f6d4?auto=format&fit=crop&q=80',
+    image_url: 'https://images.unsplash.com/photo-1601039641847-9b9a45a2f6d4?auto=format&fit=crop&q=80',
     total: 120000,
     raised: 120000,
     slotsTotal: 8,
