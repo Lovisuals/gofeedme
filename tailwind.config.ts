@@ -20,8 +20,8 @@ const config: Config = {
     extend: {
       colors: {
         primary: {
-          DEFAULT: 'hsl(var(--primary))', // #02a95c via var
-          hover: 'hsl(var(--primary-hover))',
+          DEFAULT: '#02a95c', // Official GFM green for CTAs & accents
+          hover: '#028e4d',
         },
         gray: {
           50: '#f8f8f8',
@@ -30,6 +30,8 @@ const config: Config = {
         },
         accent: {
           light: '#e9fcce',
+          DEFAULT: "hsl(var(--accent))",
+          foreground: "hsl(var(--accent-foreground))",
         },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -43,10 +45,6 @@ const config: Config = {
         muted: {
           DEFAULT: "hsl(var(--muted))",
           foreground: "hsl(var(--muted-foreground))",
-        },
-        accent: {
-          DEFAULT: "hsl(var(--accent))",
-          foreground: "hsl(var(--accent-foreground))",
         },
         popover: {
           DEFAULT: "hsl(var(--popover))",
