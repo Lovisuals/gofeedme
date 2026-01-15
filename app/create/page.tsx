@@ -7,13 +7,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { createPool } from '@/lib/actions';
+import { useRouter } from 'next/navigation';
 
 const formSchema = z.object({
   title: z.string().min(1, 'Title is required'),
   image_url: z.string().url('Invalid URL'),
-  total_amount: z.coerce.number().min(1000, 'Minimum ₦1000'),
-  slots_total: z.coerce.number().min(2, 'Minimum 2 slots'),
+  total_amount: z.number().min(1000, 'Minimum ₦1000'),
+  slots_total: z.number().min(2, 'Minimum 2 slots'),
   location: z.string().min(1, 'Location required'),
   deadline: z.string().min(1, 'Deadline required'),
 });
@@ -21,6 +21,8 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>;
 
 export default function CreatePool() {
+  const router = useRouter();
+
   const {
     register,
     handleSubmit,
@@ -35,13 +37,9 @@ export default function CreatePool() {
       formData.append(key, value.toString());
     });
 
-    const result = await createPool(formData);
-
-    if (result?.error) {
-      alert('Error: ' + result.error);
-    } else {
-      window.location.href = '/';
-    }
+    // Placeholder: real Supabase action added later
+    console.log('Form data:', data);
+    router.push('/');
   };
 
   return (
@@ -64,12 +62,12 @@ export default function CreatePool() {
             </div>
             <div>
               <Label htmlFor="total_amount">Total Amount (₦)</Label>
-              <Input id="total_amount" type="number" {...register('total_amount')} />
+              <Input id="total_amount" type="number" {...register('total_amount', { valueAsNumber: true })} />
               {errors.total_amount && <p className="text-red-600 text-sm">{errors.total_amount.message}</p>}
             </div>
             <div>
               <Label htmlFor="slots_total">Total Slots</Label>
-              <Input id="slots_total" type="number" {...register('slots_total')} />
+              <Input id="slots_total" type="number" {...register('slots_total', { valueAsNumber: true })} />
               {errors.slots_total && <p className="text-red-600 text-sm">{errors.slots_total.message}</p>}
             </div>
             <div>
