@@ -1,43 +1,36 @@
-import { redirect } from "next/navigation";
+'use client';
 
-import { createClient } from "@/lib/supabase/server";
-import { InfoIcon } from "lucide-react";
-import { FetchDataSteps } from "@/components/tutorial/fetch-data-steps";
-import { Suspense } from "react";
+import { useEffect, useState } from 'react';
+import { createClient } from '@supabase/supabase-js';
 
-async function UserDetails() {
-  const supabase = await createClient();
-  const { data, error } = await supabase.auth.getClaims();
+export default function Dashboard() {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  if (error || !data?.claims) {
-    redirect("/auth/login");
-  }
+  useEffect(() => {
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
 
-  return JSON.stringify(data.claims, null, 2);
-}
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUser(user);
+      setLoading(false);
+    };
 
-export default function ProtectedPage() {
+    getUser();
+  }, []);
+
+  if (loading) return <div className="p-8">Loading...</div>;
+
+  if (!user) return <div className="p-8">Please sign in</div>;
+
   return (
-    <div className="flex-1 w-full flex flex-col gap-12">
-      <div className="w-full">
-        <div className="bg-accent text-sm p-3 px-5 rounded-md text-foreground flex gap-3 items-center">
-          <InfoIcon size="16" strokeWidth={2} />
-          This is a protected page that you can only see as an authenticated
-          user
-        </div>
-      </div>
-      <div className="flex flex-col gap-2 items-start">
-        <h2 className="font-bold text-2xl mb-4">Your user details</h2>
-        <pre className="text-xs font-mono p-3 rounded border max-h-32 overflow-auto">
-          <Suspense>
-            <UserDetails />
-          </Suspense>
-        </pre>
-      </div>
-      <div>
-        <h2 className="font-bold text-2xl mb-4">Next steps</h2>
-        <FetchDataSteps />
-      </div>
+    <div className="min-h-screen bg-gray-50 p-8">
+      <h1 className="text-3xl font-bold mb-6">Dashboard</h1>
+      <p className="text-lg">Welcome back, {user.email}</p>
+      {/* Add your dashboard content here */}
     </div>
   );
 }
