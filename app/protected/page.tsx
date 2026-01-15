@@ -1,8 +1,20 @@
-'use client';
+import { redirect } from "next/navigation";
 
+import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { InfoIcon } from "lucide-react";
 import { FetchDataSteps } from "@/components/tutorial/fetch-data-steps";
 import { Suspense } from "react";
+
+async function UserDetails() {
+  const supabase = await createServerSupabaseClient();
+  const { data, error } = await supabase.auth.getClaims();
+
+  if (error || !data?.claims) {
+    redirect("/auth/login");
+  }
+
+  return JSON.stringify(data.claims, null, 2);
+}
 
 export default function ProtectedPage() {
   return (
@@ -17,8 +29,7 @@ export default function ProtectedPage() {
         <h2 className="font-bold text-2xl mb-4">Your user details</h2>
         <pre className="text-xs font-mono p-3 rounded border max-h-32 overflow-auto">
           <Suspense fallback={<div>Loading user details...</div>}>
-            {/* UserDetails moved to server component */}
-            <UserDetailsServer />
+            <UserDetails />
           </Suspense>
         </pre>
       </div>
@@ -28,16 +39,4 @@ export default function ProtectedPage() {
       </div>
     </div>
   );
-}
-
-// Server component for user details
-async function UserDetailsServer() {
-  const supabase = await import('@/lib/supabase/server-only').then(m => m.createServerSupabaseClient());
-  const { data, error } = await supabase.auth.getClaims();
-
-  if (error || !data?.claims) {
-    return <div>Error loading user details</div>;
-  }
-
-  return JSON.stringify(data.claims, null, 2);
 }
