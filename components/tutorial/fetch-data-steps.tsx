@@ -1,5 +1,5 @@
 import { TutorialStep } from "./tutorial-step";
-import CodeBlock from "./code-block";  # Corrected import - default export
+import CodeBlock from "./code-block"; // Corrected import - default export
 
 const create = `create table notes (
   id bigserial primary key,
