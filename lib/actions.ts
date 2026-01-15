@@ -5,7 +5,7 @@ import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
 export async function createPool(formData: FormData) {
-  const cookieStore = await cookies();  // Await here - resolves the Promise
+  const cookieStore = await cookies();
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -40,7 +40,7 @@ export async function createPool(formData: FormData) {
 }
 
 export async function getActivePools() {
-  const cookieStore = await cookies();  // Await here too
+  const cookieStore = await cookies();
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,

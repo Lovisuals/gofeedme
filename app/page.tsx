@@ -2,63 +2,46 @@ import Navbar from '@/components/Navbar';
 import PoolCard from '@/components/PoolCard';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { ShieldCheck, Zap, Users, Wheat, Beef, Sprout, ArrowRight } from 'lucide-react';
+import { ShieldCheck, Zap, Users, ArrowRight } from 'lucide-react';
+import { getActivePools } from '@/lib/actions';
+import { Suspense } from 'react';
 
-// Mock data - replace with Supabase fetch later
-const MOCK_POOLS = [
-  {
-    id: '1',
-    title: '50kg Mama Gold Rice – Ikeja Market Group',
-    image_url: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&q=80',
-    total: 85000,
-    raised: 51000,
-    slotsTotal: 10,
-    slotsFilled: 6,
-    location: 'Ikeja, Lagos',
-    timeLeft: '2 days left',
-  },
-  {
-    id: '2',
-    title: 'Bulk Frozen Chicken – Family Pot for Weekend',
-    image_url: 'https://images.unsplash.com/photo-1541447233767-f01878d6b7b2?auto=format&fit=crop&q=80',
-    total: 45000,
-    raised: 22500,
-    slotsTotal: 5,
-    slotsFilled: 3,
-    location: 'Lekki Phase 1',
-    timeLeft: '1 week',
-  },
-  {
-    id: '3',
-    title: 'Yam & Garri Bundle – Ogun Farmers Coop',
-    image_url: 'https://images.unsplash.com/photo-1601039641847-9b9a45a2f6d4?auto=format&fit=crop&q=80',
-    total: 120000,
-    raised: 120000,
-    slotsTotal: 8,
-    slotsFilled: 8,
-    location: 'Abeokuta',
-    timeLeft: 'Completed',
-  },
-];
+function PoolsFallback() {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      {[1, 2, 3].map((i) => (
+        <Card key={i} className="overflow-hidden border border-gray-200 animate-pulse">
+          <div className="h-48 bg-gray-200" />
+          <CardContent className="pt-4">
+            <div className="h-6 bg-gray-200 rounded w-3/4 mb-2" />
+            <div className="h-4 bg-gray-200 rounded w-1/2 mb-4" />
+            <div className="h-2 bg-gray-200 rounded mb-4" />
+            <div className="flex justify-between">
+              <div className="h-4 bg-gray-200 rounded w-1/4" />
+              <div className="h-4 bg-gray-200 rounded w-1/4" />
+            </div>
+          </CardContent>
+        </Card>
+      ))}
+    </div>
+  );
+}
 
-export default function Home() {
+export default async function Home() {
+  const pools = await getActivePools();
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
 
-      {/* Hero with subtle background bubbles */}
-      <section className="relative pt-24 pb-16 bg-white overflow-hidden">
-        <div className="absolute inset-0 opacity-10 pointer-events-none">
-          <div className="w-96 h-96 rounded-full bg-primary blur-3xl absolute -top-48 -left-48"></div>
-          <div className="w-64 h-64 rounded-full bg-accent-light blur-2xl absolute -bottom-32 -right-32"></div>
-        </div>
-        <div className="relative z-10 max-w-4xl mx-auto px-6 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 leading-tight">
-            Successful Food & Farm Pools<br />
-            <span className="text-primary">Start Here</span>
+      {/* Hero */}
+      <section className="relative pt-24 pb-16 bg-white">
+        <div className="max-w-4xl mx-auto px-6 text-center">
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+            Pool Resources, Eat Better, Farm Smarter
           </h1>
           <p className="text-xl text-gray-600 mb-8">
-            Pool resources for bulk discounts on staples, proteins, produce, and harvests. Escrow-protected, community-driven.
+            Join or start food & farming pools. Bulk discounts, escrow safety, community power.
           </p>
           <Button size="lg" className="bg-primary hover:bg-primary-hover text-white px-10 py-6 text-lg">
             Start a Pool
@@ -89,7 +72,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Category Round Circles (GFM adaptation) */}
+      {/* Category Rings */}
       <section className="py-16 bg-gray-50">
         <div className="max-w-6xl mx-auto px-6">
           <h2 className="text-3xl font-bold text-center mb-12">Discover by Category</h2>
@@ -124,24 +107,47 @@ export default function Home() {
           </Button>
         </div>
 
-        {MOCK_POOLS.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {MOCK_POOLS.map((pool) => (
-              <PoolCard key={pool.id} pool={pool} />
-            ))}
-          </div>
-        ) : (
-          <Card className="p-12 text-center">
-            <CardContent>
-              <h3 className="text-xl font-semibold mb-4">No active pools yet</h3>
-              <p className="text-gray-600 mb-6">Be the first to start one!</p>
-              <Button asChild>
-                <a href="/create">Create Pool</a>
-              </Button>
-            </CardContent>
-          </Card>
-        )}
+        <Suspense fallback={<PoolsFallback />}>
+          {pools.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {pools.map((pool) => (
+                <PoolCard key={pool.id} pool={pool} />
+              ))}
+            </div>
+          ) : (
+            <Card className="p-12 text-center">
+              <CardContent>
+                <h3 className="text-xl font-semibold mb-4">No active pools yet</h3>
+                <p className="text-gray-600 mb-6">Be the first to start one!</p>
+                <Button asChild>
+                  <a href="/create">Create Pool</a>
+                </Button>
+              </CardContent>
+            </Card>
+          )}
+        </Suspense>
       </section>
+    </div>
+  );
+}
+
+function PoolsFallback() {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      {[1, 2, 3].map((i) => (
+        <Card key={i} className="overflow-hidden border border-gray-200 animate-pulse">
+          <div className="h-48 bg-gray-200" />
+          <CardContent className="pt-4">
+            <div className="h-6 bg-gray-200 rounded w-3/4 mb-2" />
+            <div className="h-4 bg-gray-200 rounded w-1/2 mb-4" />
+            <div className="h-2 bg-gray-200 rounded mb-4" />
+            <div className="flex justify-between">
+              <div className="h-4 bg-gray-200 rounded w-1/4" />
+              <div className="h-4 bg-gray-200 rounded w-1/4" />
+            </div>
+          </CardContent>
+        </Card>
+      ))}
     </div>
   );
 }
