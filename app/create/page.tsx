@@ -41,7 +41,7 @@ export default function CreatePool() {
     const result = await createPool(formData);
 
     if (result?.error) {
-      alert('Error: ' + result.error);
+      alert('Error creating pool: ' + result.error);
     } else {
       router.push('/');
     }
