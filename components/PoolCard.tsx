@@ -7,7 +7,7 @@ interface PoolCardProps {
   pool: {
     id: string;
     title: string;
-    image: string;
+    image_url: string;
     total: number;
     raised: number;
     slotsTotal: number;
@@ -25,7 +25,7 @@ export default function PoolCard({ pool }: PoolCardProps) {
     <Card className="overflow-hidden hover:shadow-md transition-shadow cursor-pointer border border-gray-200">
       <div className="relative h-48">
         <Image
-          src={pool.image}
+          src={pool.image_url || 'https://via.placeholder.com/400x300?text=No+Image'}
           alt={pool.title}
           fill
           className="object-cover"
@@ -36,22 +36,19 @@ export default function PoolCard({ pool }: PoolCardProps) {
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          {/* Progress */}
           <div>
             <div className="flex justify-between text-sm mb-1">
               <span className="font-medium">{pool.slotsFilled}/{pool.slotsTotal} slots</span>
               <span className="font-medium text-primary">{percent}%</span>
             </div>
-            <Progress value={percent} className="h-2 [&>div]:bg-primary" /> {/* Tailwind override for fill color */}
+            <Progress value={percent} className="h-2 [&>div]:bg-primary" />
           </div>
 
-          {/* Price */}
           <div className="flex justify-between items-center">
             <span className="text-sm text-gray-600">Per slot</span>
             <span className="font-bold text-primary">₦{pricePerSlot.toLocaleString()}</span>
           </div>
 
-          {/* Location & Time */}
           <div className="flex justify-between text-sm text-gray-500">
             <div className="flex items-center gap-1">
               <MapPin className="h-4 w-4" />
