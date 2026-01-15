@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useRouter } from 'next/navigation';
+import { createPool } from '@/lib/actions';
 
 const formSchema = z.object({
   title: z.string().min(1, 'Title is required'),
@@ -37,9 +38,13 @@ export default function CreatePool() {
       formData.append(key, value.toString());
     });
 
-    // Placeholder: real Supabase action added later
-    console.log('Form data:', data);
-    router.push('/');
+    const result = await createPool(formData);
+
+    if (result?.error) {
+      alert('Error: ' + result.error);
+    } else {
+      window.location.href = '/';
+    }
   };
 
   return (
