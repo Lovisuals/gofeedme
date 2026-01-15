@@ -2,7 +2,7 @@ import Navbar from '@/components/Navbar';
 import PoolCard from '@/components/PoolCard';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { ShieldCheck, Zap, Users, Wheat, Beef, Sprout, ArrowRight } from 'lucide-react';
+import { ShieldCheck, Zap, Users, ArrowRight } from 'lucide-react';
 import { getActivePools } from '@/lib/actions';
 import { Suspense } from 'react';
 
