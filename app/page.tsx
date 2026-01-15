@@ -2,9 +2,9 @@ import Navbar from '@/components/Navbar';
 import PoolCard from '@/components/PoolCard';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { ShieldCheck, Zap, Users, ArrowRight } from 'lucide-react';
+import { ShieldCheck, Zap, Users, Wheat, Beef, Sprout, ArrowRight } from 'lucide-react';
 
-// Mock data - using image_url to match PoolCard props and Supabase
+// Mock data - replace with Supabase fetch later
 const MOCK_POOLS = [
   {
     id: '1',
@@ -46,14 +46,19 @@ export default function Home() {
     <div className="min-h-screen bg-gray-50">
       <Navbar />
 
-      {/* Hero */}
-      <section className="relative pt-24 pb-16 bg-white">
-        <div className="max-w-4xl mx-auto px-6 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-            Pool Resources, Eat Better, Farm Smarter
+      {/* Hero with subtle background bubbles */}
+      <section className="relative pt-24 pb-16 bg-white overflow-hidden">
+        <div className="absolute inset-0 opacity-10 pointer-events-none">
+          <div className="w-96 h-96 rounded-full bg-primary blur-3xl absolute -top-48 -left-48"></div>
+          <div className="w-64 h-64 rounded-full bg-accent-light blur-2xl absolute -bottom-32 -right-32"></div>
+        </div>
+        <div className="relative z-10 max-w-4xl mx-auto px-6 text-center">
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 leading-tight">
+            Successful Food & Farm Pools<br />
+            <span className="text-primary">Start Here</span>
           </h1>
           <p className="text-xl text-gray-600 mb-8">
-            Join or start food & farming pools. Bulk discounts, escrow safety, community power.
+            Pool resources for bulk discounts on staples, proteins, produce, and harvests. Escrow-protected, community-driven.
           </p>
           <Button size="lg" className="bg-primary hover:bg-primary-hover text-white px-10 py-6 text-lg">
             Start a Pool
@@ -80,6 +85,30 @@ export default function Home() {
               <h3 className="font-bold text-lg">Community Powered</h3>
               <p className="text-gray-600">Verified participants</p>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Category Round Circles (GFM adaptation) */}
+      <section className="py-16 bg-gray-50">
+        <div className="max-w-6xl mx-auto px-6">
+          <h2 className="text-3xl font-bold text-center mb-12">Discover by Category</h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            {[
+              { icon: Wheat, title: 'Staples' },
+              { icon: Beef, title: 'Proteins' },
+              { icon: Sprout, title: 'Fresh Produce' },
+              { icon: Users, title: 'Community Harvest' },
+            ].map((cat, i) => (
+              <Card key={i} className="text-center hover:shadow-md transition-shadow cursor-pointer border border-transparent hover:border-primary/20">
+                <CardContent className="pt-6">
+                  <div className="w-16 h-16 mx-auto bg-primary/10 rounded-full flex items-center justify-center mb-4 hover:scale-110 transition-transform">
+                    <cat.icon className="h-8 w-8 text-primary" />
+                  </div>
+                  <h3 className="font-semibold text-gray-900">{cat.title}</h3>
+                </CardContent>
+              </Card>
+            ))}
           </div>
         </div>
       </section>
