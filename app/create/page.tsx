@@ -7,7 +7,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { useRouter } from 'next/navigation';
 import { createPool } from '@/lib/actions';
 
 const formSchema = z.object({
@@ -22,8 +21,6 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>;
 
 export default function CreatePool() {
-  const router = useRouter();
-
   const {
     register,
     handleSubmit,
@@ -41,7 +38,7 @@ export default function CreatePool() {
     const result = await createPool(formData);
 
     if (result?.error) {
-      alert('Error: ' + result.error);
+      alert('Error creating pool: ' + result.error);
     } else {
       window.location.href = '/';
     }
