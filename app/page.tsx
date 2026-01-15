@@ -4,12 +4,12 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { ShieldCheck, Zap, Users, ArrowRight } from 'lucide-react';
 
-// Mock data - using image_url to match PoolCard props and Supabase
+// Mock data - replace with Supabase fetch later
 const MOCK_POOLS = [
   {
     id: '1',
     title: '50kg Mama Gold Rice – Ikeja Market Group',
-    image_url: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&q=80',
+    image: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&q=80',
     total: 85000,
     raised: 51000,
     slotsTotal: 10,
@@ -20,7 +20,7 @@ const MOCK_POOLS = [
   {
     id: '2',
     title: 'Bulk Frozen Chicken – Family Pot for Weekend',
-    image_url: 'https://images.unsplash.com/photo-1541447233767-f01878d6b7b2?auto=format&fit=crop&q=80',
+    image: 'https://images.unsplash.com/photo-1541447233767-f01878d6b7b2?auto=format&fit=crop&q=80',
     total: 45000,
     raised: 22500,
     slotsTotal: 5,
@@ -31,7 +31,7 @@ const MOCK_POOLS = [
   {
     id: '3',
     title: 'Yam & Garri Bundle – Ogun Farmers Coop',
-    image_url: 'https://images.unsplash.com/photo-1601039641847-9b9a45a2f6d4?auto=format&fit=crop&q=80',
+    image: 'https://images.unsplash.com/photo-1601039641847-9b9a45a2f6d4?auto=format&fit=crop&q=80',
     total: 120000,
     raised: 120000,
     slotsTotal: 8,
@@ -95,11 +95,23 @@ export default function Home() {
           </Button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {MOCK_POOLS.map((pool) => (
-            <PoolCard key={pool.id} pool={pool} />
-          ))}
-        </div>
+        {MOCK_POOLS.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {MOCK_POOLS.map((pool) => (
+              <PoolCard key={pool.id} pool={pool} />
+            ))}
+          </div>
+        ) : (
+          <Card className="p-12 text-center">
+            <CardContent>
+              <h3 className="text-xl font-semibold mb-4">No active pools yet</h3>
+              <p className="text-gray-600 mb-6">Be the first to start one!</p>
+              <Button asChild>
+                <a href="/create">Create Pool</a>
+              </Button>
+            </CardContent>
+          </Card>
+        )}
       </section>
     </div>
   );
