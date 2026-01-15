@@ -2,7 +2,7 @@ import Navbar from '@/components/Navbar';
 import PoolCard from '@/components/PoolCard';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { ShieldCheck, Zap, Users, ArrowRight } from 'lucide-react';
+import { ShieldCheck, Zap, Users, Wheat, Beef, Sprout, ArrowRight } from 'lucide-react';
 import { getActivePools } from '@/lib/actions';
 import { Suspense } from 'react';
 
@@ -75,7 +75,7 @@ export default async function Home() {
       {/* Category Rings */}
       <section className="py-16 bg-gray-50">
         <div className="max-w-6xl mx-auto px-6">
-          <h2 className="text-3xl font-bold text-center mb-12">Discover by Category</h2>
+          <h2 className="text-3xl font-bold text-center mb-12 text-gray-900">Discover by Category</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {[
               { icon: Wheat, title: 'Staples' },
