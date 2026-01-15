@@ -7,13 +7,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { useRouter } from 'next/navigation';
+import { createPool } from '@/lib/actions';
 
 const formSchema = z.object({
   title: z.string().min(1, 'Title is required'),
   image_url: z.string().url('Invalid URL'),
-  total_amount: z.number().min(1000, 'Minimum ₦1000'),
-  slots_total: z.number().min(2, 'Minimum 2 slots'),
+  total_amount: z.coerce.number().min(1000, 'Minimum ₦1000'),
+  slots_total: z.coerce.number().min(2, 'Minimum 2 slots'),
   location: z.string().min(1, 'Location required'),
   deadline: z.string().min(1, 'Deadline required'),
 });
@@ -21,19 +21,27 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>;
 
 export default function CreatePool() {
-  const router = useRouter();
-
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<FormValues>({
     resolver: zodResolver(formSchema),
   });
 
-  const onSubmit = (data: FormValues) => {
-    console.log('Form data:', data);
-    router.push('/');
+  const onSubmit = async (data: FormValues) => {
+    const formData = new FormData();
+    Object.entries(data).forEach(([key, value]) => {
+      formData.append(key, value.toString());
+    });
+
+    const result = await createPool(formData);
+
+    if (result?.error) {
+      alert('Error: ' + result.error);
+    } else {
+      window.location.href = '/';
+    }
   };
 
   return (
@@ -56,12 +64,12 @@ export default function CreatePool() {
             </div>
             <div>
               <Label htmlFor="total_amount">Total Amount (₦)</Label>
-              <Input id="total_amount" type="number" {...register('total_amount', { valueAsNumber: true })} />
+              <Input id="total_amount" type="number" {...register('total_amount')} />
               {errors.total_amount && <p className="text-red-600 text-sm">{errors.total_amount.message}</p>}
             </div>
             <div>
               <Label htmlFor="slots_total">Total Slots</Label>
-              <Input id="slots_total" type="number" {...register('slots_total', { valueAsNumber: true })} />
+              <Input id="slots_total" type="number" {...register('slots_total')} />
               {errors.slots_total && <p className="text-red-600 text-sm">{errors.slots_total.message}</p>}
             </div>
             <div>
@@ -74,8 +82,12 @@ export default function CreatePool() {
               <Input id="deadline" type="date" {...register('deadline')} />
               {errors.deadline && <p className="text-red-600 text-sm">{errors.deadline.message as string}</p>}
             </div>
-            <Button type="submit" className="w-full bg-primary hover:bg-primary-hover">
-              Create Pool
+            <Button
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full bg-primary hover:bg-primary-hover"
+            >
+              {isSubmitting ? 'Creating...' : 'Create Pool'}
             </Button>
           </form>
         </CardContent>
