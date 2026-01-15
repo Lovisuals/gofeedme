@@ -3,18 +3,50 @@ import PoolCard from '@/components/PoolCard';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { ShieldCheck, Zap, Users, ArrowRight } from 'lucide-react';
-import { getActivePools } from '@/lib/actions';
 
-// Removed 'force-dynamic' to avoid caching conflict – page is static by default, but fetch is server-side
+// Mock data for demo - replace with real Supabase fetch later
+const MOCK_POOLS = [
+  {
+    id: '1',
+    title: 'Bulk 50kg Rice for Lagos Coop',
+    image: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&q=80',
+    total: 85000,
+    raised: 51000,
+    slotsTotal: 10,
+    slotsFilled: 6,
+    location: 'Ikeja, Lagos',
+    timeLeft: '2 days left',
+  },
+  {
+    id: '2',
+    title: 'Shared Tractor Rental - Ogun Farmers',
+    image: 'https://images.unsplash.com/photo-1601598851540-6e636c7a493e?auto=format&fit=crop&q=80',
+    total: 250000,
+    raised: 100000,
+    slotsTotal: 5,
+    slotsFilled: 2,
+    location: 'Abeokuta',
+    timeLeft: '1 week',
+  },
+  {
+    id: '3',
+    title: 'Community Yam Harvest Pool',
+    image: 'https://images.unsplash.com/photo-1601039641847-9b9a45a2f6d4?auto=format&fit=crop&q=80',
+    total: 120000,
+    raised: 120000,
+    slotsTotal: 12,
+    slotsFilled: 12,
+    location: 'Benin City',
+    timeLeft: 'Completed',
+  },
+];
 
-export default async function Home() {
-  const pools = await getActivePools();
-
+export default function Home() {
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
 
-      {/* Hero */}
+      {/* Hero - Simplified for now, expand later */}
       <section className="relative pt-24 pb-16 bg-white">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
@@ -52,7 +84,7 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* Active Pools */}
+      {/* Active Pools Grid */}
       <section className="py-16 max-w-6xl mx-auto px-6">
         <div className="flex justify-between items-center mb-8">
           <h2 className="text-3xl font-bold text-gray-900">Active Pools</h2>
@@ -63,9 +95,9 @@ export default async function Home() {
           </Button>
         </div>
 
-        {pools.length > 0 ? (
+        {MOCK_POOLS.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {pools.map((pool) => (
+            {MOCK_POOLS.map((pool) => (
               <PoolCard key={pool.id} pool={pool} />
             ))}
           </div>
