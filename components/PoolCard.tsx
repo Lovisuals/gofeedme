@@ -35,20 +35,22 @@ export default function PoolCard({ pool }: PoolCardProps) {
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          {/* Circular Progress Ring */}
+          {/* Circular Progress Ring with explicit stroke colors */}
           <div className="flex items-center justify-between">
             <div className="relative w-16 h-16">
               <svg className="w-full h-full" viewBox="0 0 100 100">
+                {/* Background circle */}
                 <circle
-                  className="text-gray-200"
+                  stroke="#e5e7eb"
                   strokeWidth="8"
                   fill="transparent"
                   r="46"
                   cx="50"
                   cy="50"
                 />
+                {/* Progress circle */}
                 <circle
-                  className="text-primary"
+                  stroke="#02a95c"
                   strokeWidth="8"
                   fill="transparent"
                   r="46"
@@ -63,6 +65,7 @@ export default function PoolCard({ pool }: PoolCardProps) {
                 {percent}%
               </div>
             </div>
+
             <div className="text-right">
               <div className="text-sm text-gray-600">Slots</div>
               <div className="font-bold text-primary">{pool.slotsFilled}/{pool.slotsTotal}</div>
@@ -75,15 +78,17 @@ export default function PoolCard({ pool }: PoolCardProps) {
             <span className="font-bold text-primary">₦{pricePerSlot.toLocaleString()}</span>
           </div>
 
-          {/* Location & Time */}
-          <div className="flex justify-between text-sm text-gray-500">
-            <div className="flex items-center gap-1">
+          {/* Location, Time, Urgency */}
+          <div className="flex justify-between text-sm">
+            <div className="flex items-center gap-1 text-gray-500">
               <MapPin className="h-4 w-4" />
               {pool.location}
             </div>
             <div className="flex items-center gap-1">
-              <Clock className="h-4 w-4" />
-              {pool.timeLeft}
+              <Clock className="h-4 w-4 text-gray-500" />
+              <span className={pool.timeLeft.includes('left') ? 'text-red-600 font-medium' : 'text-gray-500'}>
+                {pool.timeLeft}
+              </span>
             </div>
           </div>
         </div>
