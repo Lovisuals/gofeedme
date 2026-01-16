@@ -1,10 +1,10 @@
-import { createServerSupabaseClient } from '@/lib/supabase/server';
+import { createReadonlySupabaseClient } from '@/lib/supabase/server';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { logoutAction } from '@/app/auth/actions/auth';
 
 export default async function Navbar() {
-  const supabase = await createServerSupabaseClient();
+  const supabase = await createReadonlySupabaseClient();
   const { data: { user } } = await supabase.auth.getUser();
 
   return (
