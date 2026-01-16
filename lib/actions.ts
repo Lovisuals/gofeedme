@@ -3,6 +3,17 @@
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
+import { z } from 'zod';
+
+const poolSchema = z.object({
+  title: z.string().min(1, 'Title is required'),
+  image_url: z.string().url('Invalid URL').optional(),
+  total_amount: z.number().min(1000, 'Minimum ₦1000'),
+  slots_total: z.number().min(2, 'Minimum 2 slots'),
+  location: z.string().min(1, 'Location required'),
+  deadline: z.string().min(1, 'Deadline required'),
+  status: z.enum(['active', 'filled', 'completed', 'cancelled']),
+});
 
 export async function createPool(formData: FormData) {
   const cookieStore = await cookies();
@@ -25,7 +36,13 @@ export async function createPool(formData: FormData) {
     }
   );
 
-  const data = {
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { error: 'You must be signed in to create a pool' };
+  }
+
+  const rawData = {
     title: formData.get('title') as string,
     image_url: formData.get('image_url') as string,
     total_amount: Number(formData.get('total_amount')),
@@ -33,6 +50,17 @@ export async function createPool(formData: FormData) {
     location: formData.get('location') as string,
     deadline: formData.get('deadline') as string,
     status: 'active',
+  };
+
+  const parsed = poolSchema.safeParse(rawData);
+
+  if (!parsed.success) {
+    return { error: parsed.error.errors.map(e => e.message).join(', ') };
+  }
+
+  const data = {
+    ...parsed.data,
+    creator_id: user.id,
   };
 
   const { error } = await supabase.from('pools').insert([data]);
@@ -66,8 +94,6 @@ export async function getActivePools() {
     }
   );
 
-  console.log('Fetching active pools...');
-
   const { data, error } = await supabase
     .from('pools')
     .select('*')
@@ -79,8 +105,6 @@ export async function getActivePools() {
     console.error('Get active pools error:', error);
     return [];
   }
-
-  console.log('Pools fetched:', data.length);
 
   return data.map(pool => ({
     id: pool.id,

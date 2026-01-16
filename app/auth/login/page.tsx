@@ -37,9 +37,8 @@ export default function LoginPage() {
       return;
     }
 
-    // Wait briefly and check session
+    // Wait and confirm session
     await new Promise(r => setTimeout(r, 800));
-
     const { data: { session } } = await supabase.auth.getSession();
 
     if (session) {
