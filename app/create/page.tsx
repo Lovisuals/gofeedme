@@ -8,21 +8,23 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useRouter } from 'next/navigation';
-import { createPool } from '@/lib/actions';
+import { createClient } from '@supabase/supabase-js';
+import { useState } from 'react';
 
 const formSchema = z.object({
   title: z.string().min(1, 'Title is required'),
-  image_url: z.string().url('Invalid URL'),
   total_amount: z.number().min(1000, 'Minimum ₦1000'),
   slots_total: z.number().min(2, 'Minimum 2 slots'),
   location: z.string().min(1, 'Location required'),
   deadline: z.string().min(1, 'Deadline required'),
+  image: z.instanceof(File).optional(),  // File upload optional for now
 });
 
 type FormValues = z.infer<typeof formSchema>;
 
 export default function CreatePool() {
   const router = useRouter();
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   const {
     register,
@@ -33,17 +35,49 @@ export default function CreatePool() {
   });
 
   const onSubmit = async (data: FormValues) => {
-    const formData = new FormData();
-    Object.entries(data).forEach(([key, value]) => {
-      formData.append(key, value.toString());
-    });
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
 
-    const result = await createPool(formData);
+    let image_url = '';
 
-    if (result?.error) {
-      alert('Error creating pool: ' + result.error);
+    if (data.image) {
+      const { data: uploadData, error } = await supabase.storage
+        .from('pools-images')  // Bucket name - create in Supabase Storage
+        .upload(`public/${data.image.name}`, data.image);
+
+      if (error) {
+        alert('Error uploading image: ' + error.message);
+        return;
+      }
+
+      image_url = supabase.storage.from('pools-images').getPublicUrl(uploadData.path).data.publicUrl;
+    }
+
+    const poolData = {
+      title: data.title,
+      image_url,
+      total_amount: data.total_amount,
+      slots_total: data.slots_total,
+      location: data.location,
+      deadline: data.deadline,
+      status: 'active',
+    };
+
+    const { error } = await supabase.from('pools').insert([poolData]);
+
+    if (error) {
+      alert('Error creating pool: ' + error.message);
     } else {
       router.push('/');
+    }
+  };
+
+  const onImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImagePreview(URL.createObjectURL(file));
     }
   };
 
@@ -61,9 +95,10 @@ export default function CreatePool() {
               {errors.title && <p className="text-red-600 text-sm">{errors.title.message}</p>}
             </div>
             <div>
-              <Label htmlFor="image_url">Image URL</Label>
-              <Input id="image_url" type="url" {...register('image_url')} />
-              {errors.image_url && <p className="text-red-600 text-sm">{errors.image_url.message}</p>}
+              <Label htmlFor="image">Image (Gallery or Camera)</Label>
+              <Input id="image" type="file" accept="image/*" capture="environment" onChange={onImageChange} {...register('image')} />
+              {imagePreview && <img src={imagePreview} alt="Preview" className="mt-2 h-48 w-full object-cover rounded" />}
+              {errors.image && <p className="text-red-600 text-sm">{errors.image.message}</p>}
             </div>
             <div>
               <Label htmlFor="total_amount">Total Amount (₦)</Label>
