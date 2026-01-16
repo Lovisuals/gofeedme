@@ -19,6 +19,12 @@ export async function createPool(formData: FormData) {
     }
   );
 
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { error: 'You must be signed in to create a pool' };
+  }
+
   const data = {
     title: formData.get('title') as string,
     image_url: formData.get('image_url') as string,
@@ -27,6 +33,7 @@ export async function createPool(formData: FormData) {
     location: formData.get('location') as string,
     deadline: formData.get('deadline') as string,
     status: 'active',
+    creator_id: user.id,  // Automatically set creator
   };
 
   const { error } = await supabase.from('pools').insert([data]);
