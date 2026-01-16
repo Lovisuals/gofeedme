@@ -15,15 +15,15 @@ export async function createPool(formData: FormData) {
         get(name) {
           return cookieStore.get(name)?.value;
         },
+        set(name, value, options) {
+          cookieStore.set({ name, value, ...options });
+        },
+        remove(name, options) {
+          cookieStore.delete({ name, ...options });
+        },
       },
     }
   );
-
-  const { data: { user } } = await supabase.auth.getUser();
-
-  if (!user) {
-    return { error: 'You must be signed in to create a pool' };
-  }
 
   const data = {
     title: formData.get('title') as string,
@@ -33,13 +33,12 @@ export async function createPool(formData: FormData) {
     location: formData.get('location') as string,
     deadline: formData.get('deadline') as string,
     status: 'active',
-    creator_id: user.id,
   };
 
   const { error } = await supabase.from('pools').insert([data]);
 
   if (error) {
-    console.error('Supabase insert error:', error);
+    console.error('Create pool error:', error);
     return { error: error.message };
   }
 
@@ -57,9 +56,17 @@ export async function getActivePools() {
         get(name) {
           return cookieStore.get(name)?.value;
         },
+        set(name, value, options) {
+          cookieStore.set({ name, value, ...options });
+        },
+        remove(name, options) {
+          cookieStore.delete({ name, ...options });
+        },
       },
     }
   );
+
+  console.log('Fetching active pools...');
 
   const { data, error } = await supabase
     .from('pools')
@@ -69,9 +76,11 @@ export async function getActivePools() {
     .limit(6);
 
   if (error) {
-    console.error('Supabase fetch error:', error);
+    console.error('Get active pools error:', error);
     return [];
   }
+
+  console.log('Pools fetched:', data.length);
 
   return data.map(pool => ({
     id: pool.id,
