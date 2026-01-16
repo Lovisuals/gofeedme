@@ -8,11 +8,11 @@ import { z } from 'zod';
 const poolSchema = z.object({
   title: z.string().min(1, 'Title is required'),
   image_url: z.string().url('Invalid URL').optional(),
-  total_amount: z.number().min(1000, 'Minimum ₦1000'),
-  slots_total: z.number().min(2, 'Minimum 2 slots'),
+  total_amount: z.coerce.number().min(1000, 'Minimum ₦1000'),
+  slots_total: z.coerce.number().min(2, 'Minimum 2 slots'),
   location: z.string().min(1, 'Location required'),
-  deadline: z.string().min(1, 'Deadline required'),
-  status: z.enum(['active', 'filled', 'completed', 'cancelled']),
+  deadline: z.coerce.date().refine(date => date > new Date(), { message: 'Deadline must be in the future' }),
+  status: z.literal('active'),
 });
 
 export async function createPool(formData: FormData) {
@@ -43,12 +43,12 @@ export async function createPool(formData: FormData) {
   }
 
   const rawData = {
-    title: formData.get('title') as string,
-    image_url: formData.get('image_url') as string,
-    total_amount: Number(formData.get('total_amount')),
-    slots_total: Number(formData.get('slots_total')),
-    location: formData.get('location') as string,
-    deadline: formData.get('deadline') as string,
+    title: formData.get('title'),
+    image_url: formData.get('image_url'),
+    total_amount: formData.get('total_amount'),
+    slots_total: formData.get('slots_total'),
+    location: formData.get('location'),
+    deadline: formData.get('deadline'),
     status: 'active',
   };
 
