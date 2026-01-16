@@ -16,12 +16,12 @@ export async function loginAction(formData: FormData) {
   });
 
   if (!parsed.success) {
-    return { error: parsed.error.errors.map(e => e.message).join(', ') };
+    return { error: parsed.error.issues.map(e => e.message).join(', ') };
   }
 
   const supabase = await createServerSupabaseClient();
 
-  const { data, error } = await supabase.auth.signInWithPassword({
+  const { error } = await supabase.auth.signInWithPassword({
     email: parsed.data.email,
     password: parsed.data.password,
   });
