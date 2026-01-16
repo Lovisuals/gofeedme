@@ -9,7 +9,7 @@ const loginSchema = z.object({
   password: z.string().min(1, 'Password required'),
 });
 
-export async function loginAction(prevState: any, formData: FormData) {
+export async function loginAction(formData: FormData) {
   const parsed = loginSchema.safeParse({
     email: formData.get('email'),
     password: formData.get('password'),
@@ -30,11 +30,5 @@ export async function loginAction(prevState: any, formData: FormData) {
     return { error: error.message || 'Login failed' };
   }
 
-  redirect('/');
-}
-
-export async function logoutAction() {
-  const supabase = await createServerSupabaseClient();
-  await supabase.auth.signOut();
   redirect('/');
 }
