@@ -9,12 +9,28 @@ import Link from 'next/link';
 import { Eye, EyeOff } from 'lucide-react';
 
 interface LoginFormProps {
-  loginAction: (prevState: any, formData: FormData) => Promise<any>;
+  loginAction: (formData: FormData) => Promise<any>;
 }
 
 export default function LoginForm({ loginAction }: LoginFormProps) {
   const [showPassword, setShowPassword] = useState(false);
-  const [state, formAction] = useFormState(loginAction, { error: null });
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+
+    const formData = new FormData(e.currentTarget);
+    const result = await loginAction(formData);
+
+    if (result?.error) {
+      setError(result.error);
+    }
+
+    setLoading(false);
+  };
 
   return (
     <Card className="w-full max-w-md">
@@ -22,7 +38,7 @@ export default function LoginForm({ loginAction }: LoginFormProps) {
         <CardTitle className="text-2xl text-center">Sign In to GoFeedMe</CardTitle>
       </CardHeader>
       <CardContent>
-        <form action={formAction} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <Label htmlFor="email">Email</Label>
             <Input id="email" name="email" type="email" required />
@@ -37,19 +53,17 @@ export default function LoginForm({ loginAction }: LoginFormProps) {
             />
             <button
               type="button"
-              onClick={() => setShowPassword(v => !v)}
+              onClick={() => setShowPassword(!showPassword)}
               className="absolute right-3 top-9 text-gray-500"
             >
               {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
             </button>
           </div>
 
-          {state?.error && (
-            <p className="text-red-600 text-sm text-center">{state.error}</p>
-          )}
+          {error && <p className="text-red-600 text-sm text-center">{error}</p>}
 
-          <Button type="submit" className="w-full bg-primary hover:bg-primary-hover">
-            Sign In
+          <Button type="submit" className="w-full bg-primary hover:bg-primary-hover" disabled={loading}>
+            {loading ? 'Signing in...' : 'Sign In'}
           </Button>
 
           <div className="text-center text-sm text-gray-600 mt-4">
