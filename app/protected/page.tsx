@@ -1,69 +1,35 @@
 'use client';
 
-import { createClient } from '@supabase/supabase-js';
-import { useEffect, useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import Link from 'next/link';
+import { Suspense, lazy } from 'react';
+import { InfoIcon } from "lucide-react";
+import { FetchDataSteps } from "@/components/tutorial/fetch-data-steps";
 
-export default function Dashboard() {
-  const [user, setUser ] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [pools, setPools] = useState([]);
+// Lazy-load server-only part (avoids bundling server code in client)
+const UserDetails = lazy(() => import('./UserDetailsServer'));
 
-  useEffect(() => {
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    );
-
-    const getData = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      setUser(user);
-
-      // Stub: Fetch user's pools (customize later)
-      const { data: poolsData } = await supabase.from('pools').select('*').eq('created_by', user?.id);  // Assume 'created_by' column
-      setPools(poolsData || []);
-      setLoading(false);
-    };
-
-    getData();
-  }, []);
-
-  if (loading) return <div className="p-8">Loading...</div>;
-
-  if (!user) return <div className="p-8">Please sign in</div>;
-
+export default function ProtectedPage() {
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
-      <h1 className="text-3xl font-bold mb-6 text-gray-900">Your Dashboard</h1>
-      <p className="text-lg mb-8">Welcome back, {user.email}</p>
+    <div className="flex-1 w-full flex flex-col gap-12 p-6">
+      <div className="w-full">
+        <div className="bg-accent text-sm p-3 px-5 rounded-md text-foreground flex gap-3 items-center">
+          <InfoIcon size="16" strokeWidth={2} />
+          This is a protected page that you can only see as an authenticated user
+        </div>
+      </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Your Pools</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {pools.length > 0 ? (
-            <div className="grid gap-4">
-              {pools.map((pool) => (
-                <div key={pool.id} className="p-4 border rounded">
-                  <h3 className="font-semibold">{pool.title}</h3>
-                  <p>Status: {pool.status}</p>
-                  <p>Slots Filled: {pool.slots_filled}/{pool.slots_total}</p>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p>No pools yet. Start one!</p>
-          )}
-          <Link href="/create">
-            <Button className="mt-4 bg-primary hover:bg-primary-hover">Start New Pool</Button>
-          </Link>
-        </CardContent>
-      </Card>
+      <div className="flex flex-col gap-2 items-start">
+        <h2 className="font-bold text-2xl mb-4">Your user details</h2>
+        <pre className="text-xs font-mono p-3 rounded border max-h-32 overflow-auto bg-white">
+          <Suspense fallback={<div className="text-gray-500">Loading user details...</div>}>
+            <UserDetails />
+          </Suspense>
+        </pre>
+      </div>
 
-      {/* Add more sections: contributions, settings, etc. */}
+      <div>
+        <h2 className="font-bold text-2xl mb-4">Next steps</h2>
+        <FetchDataSteps />
+      </div>
     </div>
   );
 }
