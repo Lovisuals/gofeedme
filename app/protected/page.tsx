@@ -31,5 +31,4 @@ export default function ProtectedPage() {
         <FetchDataSteps />
       </div>
     </div>
-  );
-}
+  );}
