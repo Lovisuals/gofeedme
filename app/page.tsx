@@ -109,7 +109,7 @@ export default async function Home() {
 
           {pools.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {pools.map((pool) => (
+              {pools.map((pool: Pool) => (
                 <PoolCard key={pool.id} pool={pool} />
               ))}
             </div>
@@ -128,3 +128,16 @@ export default async function Home() {
     </div>
   );
 }
+
+// Add this at the top of app/page.tsx (after imports)
+type Pool = {
+  id: string;
+  title: string;
+  image_url: string;
+  total: number;
+  raised: number;
+  slotsTotal: number;
+  slotsFilled: number;
+  location: string;
+  timeLeft: string;
+};
