@@ -23,7 +23,7 @@ export default async function Navbar() {
           <div className="flex items-center gap-4">
             <input
               type="search"
-              placeholder="Search pools, location, keyword..."
+              placeholder="Search pools..."
               className="w-64 p-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary hidden md:block"
             />
             {user ? (
