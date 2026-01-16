@@ -37,13 +37,12 @@ export default function LoginPage() {
       return;
     }
 
-    // Wait for session to be set (sometimes takes a moment)
-    await new Promise(resolve => setTimeout(resolve, 500));
+    // Wait briefly and check session
+    await new Promise(r => setTimeout(r, 800));
 
     const { data: { session } } = await supabase.auth.getSession();
 
     if (session) {
-      console.log('Session created successfully:', session);
       router.push('/');
     } else {
       setError('Login succeeded but session not set. Try again.');
