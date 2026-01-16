@@ -1,5 +1,5 @@
 import LoginForm from './LoginForm';
-import { loginAction } from './actions/auth';
+import { loginAction } from '../actions/auth';
 
 export default function LoginPage() {
   return (
