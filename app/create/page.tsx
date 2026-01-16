@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -7,9 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { useRouter } from 'next/navigation';
 import { createClient } from '@supabase/supabase-js';
-import { useState } from 'react';
 
 const formSchema = z.object({
   title: z.string().min(1, 'Title is required'),
@@ -23,18 +22,16 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>;
 
 export default function CreatePool() {
-  const router = useRouter();
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<FormValues>({
+  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<FormValues>({
     resolver: zodResolver(formSchema),
   });
 
   const onSubmit = async (data: FormValues) => {
+    setError(null);
+
     const supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -43,12 +40,12 @@ export default function CreatePool() {
     let image_url = '';
 
     if (data.image) {
-      const { data: uploadData, error } = await supabase.storage
+      const { data: uploadData, error: uploadError } = await supabase.storage
         .from('pools-images')
-        .upload(`public/${data.image.name}`, data.image);
+        .upload(`public/${Date.now()}-${data.image.name}`, data.image);
 
-      if (error) {
-        alert('Error uploading image: ' + error.message);
+      if (uploadError) {
+        setError('Image upload failed: ' + uploadError.message);
         return;
       }
 
@@ -65,12 +62,12 @@ export default function CreatePool() {
       status: 'active',
     };
 
-    const { error } = await supabase.from('pools').insert([poolData]);
+    const { error: insertError } = await supabase.from('pools').insert([poolData]);
 
-    if (error) {
-      alert('Error creating pool: ' + error.message);
+    if (insertError) {
+      setError('Pool creation failed: ' + insertError.message);
     } else {
-      router.push('/');
+      window.location.href = '/';
     }
   };
 
@@ -101,12 +98,9 @@ export default function CreatePool() {
                 type="file"
                 accept="image/*"
                 capture="environment"
-                {...register('image', {
-                  onChange: onImageChange
-                })}
+                onChange={onImageChange}
               />
               {imagePreview && <img src={imagePreview} alt="Preview" className="mt-2 h-48 w-full object-cover rounded" />}
-              {errors.image && <p className="text-red-600 text-sm">{errors.image.message}</p>}
             </div>
             <div>
               <Label htmlFor="total_amount">Total Amount (₦)</Label>
@@ -128,6 +122,9 @@ export default function CreatePool() {
               <Input id="deadline" type="date" {...register('deadline')} />
               {errors.deadline && <p className="text-red-600 text-sm">{errors.deadline.message as string}</p>}
             </div>
+
+            {error && <p className="text-red-600 text-center">{error}</p>}
+
             <Button
               type="submit"
               disabled={isSubmitting}

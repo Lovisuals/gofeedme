@@ -107,20 +107,10 @@ export default async function Home() {
           </Button>
         </div>
 
-        <Suspense fallback={<PoolsFallback />}>
           {pools.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {pools.map((pool) => (
-                <div key={pool.id} className="relative">
-                  <PoolCard pool={pool} />
-                  <Button
-                    variant="secondary"
-                    className="absolute bottom-4 left-4 right-4 bg-primary text-white hover:bg-primary-hover w-1/2"
-                    disabled={pool.slotsFilled >= pool.slotsTotal}
-                  >
-                    Join Pool
-                  </Button>
-                </div>
+                <PoolCard key={pool.id} pool={pool} />
               ))}
             </div>
           ) : (
@@ -134,7 +124,6 @@ export default async function Home() {
               </CardContent>
             </Card>
           )}
-        </Suspense>
       </section>
     </div>
   );
