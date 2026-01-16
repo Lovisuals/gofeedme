@@ -32,3 +32,9 @@ export async function loginAction(formData: FormData) {
 
   redirect('/');
 }
+
+export async function logoutAction() {
+  const supabase = await createServerSupabaseClient();
+  await supabase.auth.signOut();
+  redirect('/');
+}
