@@ -15,7 +15,27 @@ const poolSchema = z.object({
 });
 
 export async function createPool(formData: FormData) {
-  const supabase = await createServerSupabaseClient();
+  console.log('[createPool] STARTED');
+
+  const cookieStore = await cookies();
+
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        get(name) {
+          return cookieStore.get(name)?.value;
+        },
+        set(name, value, options) {
+          cookieStore.set({ name, value, ...options });
+        },
+        remove(name, options) {
+          cookieStore.delete({ name, ...options });
+        },
+      },
+    }
+  );
 
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -47,10 +67,11 @@ export async function createPool(formData: FormData) {
   const { error } = await supabase.from('pools').insert([poolData]);
 
   if (error) {
-    console.error('Create pool error:', error);
+    console.error('[createPool] Error:', error);
     return { error: error.message };
   }
 
+  console.log('[createPool] SUCCESS');
   redirect('/');
 }
 
@@ -80,20 +101,12 @@ export async function getActivePools() {
 
     console.log('[getActivePools] Supabase client created');
 
-    const timeoutPromise = new Promise<never>((_, reject) =>
-      setTimeout(() => reject(new Error('Supabase query timeout')), 10000)
-    );
-
-    const queryPromise = supabase
+    const { data, error } = await supabase
       .from('pools')
       .select('*')
       .eq('status', 'active')
       .order('created_at', { ascending: false })
       .limit(6);
-
-    const result = await Promise.race([queryPromise, timeoutPromise]);
-
-    const { data, error } = result;
 
     if (error) {
       console.error('[getActivePools] Supabase error:', error);
