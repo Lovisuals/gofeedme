@@ -1,17 +1,11 @@
 import { createServerSupabaseClient } from '@/lib/supabase/server';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+import LogoutForm from './LogoutForm';
 
 export default async function Navbar() {
   const supabase = await createServerSupabaseClient();
   const { data: { user } } = await supabase.auth.getUser();
-
-  const handleLogout = async () => {
-    'use server';
-    const supabase = await createServerSupabaseClient();
-    await supabase.auth.signOut();
-    redirect('/');
-  };
 
   return (
     <nav className="fixed top-0 w-full bg-white border-b z-50">
@@ -23,9 +17,7 @@ export default async function Navbar() {
         <div className="flex items-center gap-4">
           <input type="search" placeholder="Search pools..." className="p-2 border rounded hidden md:block" />
           {user ? (
-            <form action={handleLogout}>
-              <Button variant="outline">Logout</Button>
-            </form>
+            <LogoutForm />
           ) : (
             <Link href="/auth/login">
               <Button variant="outline">Sign In</Button>
