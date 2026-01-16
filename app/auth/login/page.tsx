@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { loginAction } from '../actions/auth';   // ← correct relative path
+import { loginAction } from '../actions/auth'; // correct relative path
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
