@@ -117,7 +117,7 @@ export default async function Home() {
                   <Button
                     variant="secondary"
                     className="absolute bottom-4 right-4 bg-primary text-white hover:bg-primary-hover"
-                    disabled={!pool.slots_filled}  // Stub - disable if full
+                    disabled={pool.slotsFilled >= pool.slotsTotal}  // Use correct camelCase
                   >
                     Join Pool
                   </Button>
