@@ -96,7 +96,15 @@ export default function CreatePool() {
             </div>
             <div>
               <Label htmlFor="image">Image (Gallery or Camera)</Label>
-              <Input id="image" type="file" accept="image/*" capture="environment" onChange={onImageChange} {...register('image')} />
+              <Input
+                id="image"
+                type="file"
+                accept="image/*"
+                capture="environment"
+                {...register('image', {
+                  onChange: onImageChange,  // Merge custom preview logic here
+                })}
+              />
               {imagePreview && <img src={imagePreview} alt="Preview" className="mt-2 h-48 w-full object-cover rounded" />}
               {errors.image && <p className="text-red-600 text-sm">{errors.image.message}</p>}
             </div>
