@@ -29,27 +29,28 @@ export async function getActivePools() {
 
     console.log('[getActivePools] Supabase client created');
 
-    // Add timeout safety
-    const timeoutPromise = new Promise((_, reject) =>
+    // Query with timeout
+    const timeoutPromise = new Promise<never>((_, reject) =>
       setTimeout(() => reject(new Error('Supabase query timeout')), 10000)
     );
 
-    const { data, error } = await Promise.race([
-      supabase
-        .from('pools')
-        .select('*')
-        .eq('status', 'active')
-        .order('created_at', { ascending: false })
-        .limit(6),
-      timeoutPromise,
-    ]);
+    const queryPromise = supabase
+      .from('pools')
+      .select('*')
+      .eq('status', 'active')
+      .order('created_at', { ascending: false })
+      .limit(6);
+
+    const result = await Promise.race([queryPromise, timeoutPromise]) as Awaited<ReturnType<typeof queryPromise>>;
+
+    const { data, error } = result;
 
     if (error) {
       console.error('[getActivePools] Supabase error:', error);
       return [];
     }
 
-    console.log('[getActivePools] Pools fetched:', data?.length || 0);
+    console.log('[getActivePools] Pools fetched:', data.length);
 
     return data.map(pool => ({
       id: pool.id,
