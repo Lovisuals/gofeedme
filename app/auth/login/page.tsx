@@ -8,12 +8,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import Link from 'next/link';
-import { Eye, EyeOff } from 'lucide-react';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -28,23 +26,27 @@ export default function LoginPage() {
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     );
 
-    const { data: { user }, error: signInError } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
 
-    if (signInError) {
-      setError(signInError.message || 'Login failed');
+    if (error) {
+      setError(error.message || 'Login failed');
       setLoading(false);
       return;
     }
 
-    // Force session check
+    // Wait for session to be set (sometimes takes a moment)
+    await new Promise(resolve => setTimeout(resolve, 500));
+
     const { data: { session } } = await supabase.auth.getSession();
+
     if (session) {
+      console.log('Session created successfully:', session);
       router.push('/');
     } else {
-      setError('Session not created. Try again.');
+      setError('Login succeeded but session not set. Try again.');
     }
 
     setLoading(false);
@@ -62,22 +64,9 @@ export default function LoginPage() {
               <Label htmlFor="email">Email</Label>
               <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
             </div>
-            <div className="relative">
+            <div>
               <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type={showPassword ? 'text' : 'password'}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-9 text-gray-500"
-              >
-                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-              </button>
+              <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
             </div>
 
             {error && <p className="text-red-600 text-sm text-center">{error}</p>}
@@ -90,11 +79,6 @@ export default function LoginPage() {
               Don't have an account?{' '}
               <Link href="/auth/sign-up" className="text-primary hover:underline">
                 Sign Up
-              </Link>
-            </div>
-            <div className="text-center text-sm text-gray-600 mt-2">
-              <Link href="/auth/forgot-password" className="text-primary hover:underline">
-                Forgot password?
               </Link>
             </div>
           </form>
