@@ -17,7 +17,7 @@ const formSchema = z.object({
   slots_total: z.number().min(2, 'Minimum 2 slots'),
   location: z.string().min(1, 'Location required'),
   deadline: z.string().min(1, 'Deadline required'),
-  image: z.instanceof(File).optional(),  // File upload optional for now
+  image: z.instanceof(File).optional(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -44,7 +44,7 @@ export default function CreatePool() {
 
     if (data.image) {
       const { data: uploadData, error } = await supabase.storage
-        .from('pools-images')  // Bucket name - create in Supabase Storage
+        .from('pools-images')
         .upload(`public/${data.image.name}`, data.image);
 
       if (error) {
@@ -74,8 +74,8 @@ export default function CreatePool() {
     }
   };
 
-  const onImageChange = (e) => {
-    const file = e.target.files[0];
+  const onImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
     if (file) {
       setImagePreview(URL.createObjectURL(file));
     }
