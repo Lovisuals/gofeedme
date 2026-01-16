@@ -2,6 +2,7 @@
 
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
+import type { PostgrestResponse } from '@supabase/supabase-js';
 
 export async function getActivePools() {
   console.log('[getActivePools] STARTED');
@@ -29,11 +30,7 @@ export async function getActivePools() {
 
     console.log('[getActivePools] Supabase client created');
 
-    // Query with timeout
-    const timeoutPromise = new Promise<never>((_, reject) =>
-      setTimeout(() => reject(new Error('Supabase query timeout')), 10000)
-    );
-
+    // The actual promise we await
     const queryPromise = supabase
       .from('pools')
       .select('*')
@@ -41,7 +38,13 @@ export async function getActivePools() {
       .order('created_at', { ascending: false })
       .limit(6);
 
-    const result = await Promise.race([queryPromise, timeoutPromise]) as Awaited<ReturnType<typeof queryPromise>>;
+    // Timeout promise (never resolves successfully)
+    const timeoutPromise = new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error('Supabase query timeout')), 10000)
+    );
+
+    // Race the real query promise
+    const result = await Promise.race([queryPromise, timeoutPromise]) as PostgrestResponse<any>;
 
     const { data, error } = result;
 
