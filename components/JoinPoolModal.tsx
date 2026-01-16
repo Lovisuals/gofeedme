@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { createClient } from '@supabase/supabase-js';
+import { useState } from 'react';
+import { joinPoolAction } from '@/app/actions/joinPool';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Card, CardContent } from '@/components/ui/card';
@@ -9,25 +9,23 @@ import Link from 'next/link';
 
 interface JoinPoolModalProps {
   pool: any;
+  isLoggedIn: boolean;
 }
 
-export default function JoinPoolModal({ pool }: JoinPoolModalProps) {
+export default function JoinPoolModal({ pool, isLoggedIn }: JoinPoolModalProps) {
   const [open, setOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    );
+  const handleJoin = async () => {
+    const result = await joinPoolAction(pool.id);
 
-    const checkAuth = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      setIsLoggedIn(!!user);
-    };
-
-    checkAuth();
-  }, []);
+    if (result?.error) {
+      setError(result.error);
+    } else {
+      setOpen(false);
+      window.location.reload(); // Refresh to show updated slots
+    }
+  };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -49,9 +47,12 @@ export default function JoinPoolModal({ pool }: JoinPoolModalProps) {
             <p><strong>Payment:</strong> Funds held in escrow until delivery</p>
 
             {isLoggedIn ? (
-              <Button className="w-full bg-primary hover:bg-primary-hover" disabled={pool.slotsFilled >= pool.slotsTotal}>
-                Confirm & Pay Now
-              </Button>
+              <>
+                <Button onClick={handleJoin} className="w-full bg-primary hover:bg-primary-hover" disabled={pool.slotsFilled >= pool.slotsTotal}>
+                  Confirm & Pay Now
+                </Button>
+                {error && <p className="text-red-600 text-sm text-center">{error}</p>}
+              </>
             ) : (
               <div className="text-center">
                 <p className="text-sm text-gray-600 mb-4">Sign up to join this pool and commit securely.</p>
