@@ -9,7 +9,7 @@ import Link from 'next/link';
 import { Eye, EyeOff } from 'lucide-react';
 
 interface LoginFormProps {
-  loginAction: (formData: FormData) => Promise<any>;
+  loginAction: (prevState: any, formData: FormData) => Promise<any>;
 }
 
 export default function LoginForm({ loginAction }: LoginFormProps) {
@@ -23,7 +23,7 @@ export default function LoginForm({ loginAction }: LoginFormProps) {
     setError(null);
 
     const formData = new FormData(e.currentTarget);
-    const result = await loginAction(formData);
+    const result = await loginAction(null, formData);  // pass null for prevState (first call)
 
     if (result?.error) {
       setError(result.error);
