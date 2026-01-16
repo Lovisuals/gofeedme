@@ -7,9 +7,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 
-export default function Dashboard() {
+export default function ProtectedPage() {
   const [user, setUser] = useState<User | null>(null);
-  const [pools, setPools] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -19,24 +18,15 @@ export default function Dashboard() {
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     );
 
-    const getData = async () => {
+    const checkUser = async () => {
       try {
-        const { data: { user }, error: userError } = await supabase.auth.getUser();
-        if (userError) throw userError;
+        const { data: { user }, error } = await supabase.auth.getUser();
+        if (error) throw error;
         if (!user) {
           window.location.href = '/auth/login';
           return;
         }
         setUser(user);
-
-        // Stub: Fetch user's created pools
-        const { data: poolsData, error: poolsError } = await supabase
-          .from('pools')
-          .select('*')
-          .eq('creator_id', user.id)
-          .order('created_at', { ascending: false });
-        if (poolsError) throw poolsError;
-        setPools(poolsData || []);
       } catch (err) {
         setError((err as Error).message || 'Failed to load dashboard');
       } finally {
@@ -44,7 +34,7 @@ export default function Dashboard() {
       }
     };
 
-    getData();
+    checkUser();
   }, []);
 
   if (loading) return <div className="p-8 text-center">Loading dashboard...</div>;
@@ -64,23 +54,7 @@ export default function Dashboard() {
             <CardTitle>Your Created Pools</CardTitle>
           </CardHeader>
           <CardContent>
-            {pools.length > 0 ? (
-              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {pools.map((pool) => (
-                  <Card key={pool.id}>
-                    <CardContent className="p-4">
-                      <h3 className="font-semibold text-lg">{pool.title}</h3>
-                      <p className="text-sm text-gray-600 mt-1">{pool.location} · {pool.status}</p>
-                      <p className="text-sm mt-2">
-                        Slots: {pool.slots_filled || 0}/{pool.slots_total}
-                      </p>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            ) : (
-              <p className="text-gray-600">You haven't created any pools yet.</p>
-            )}
+            <p className="text-gray-600">No pools created yet. Start one!</p>
             <Link href="/create">
               <Button className="mt-6 bg-primary hover:bg-primary-hover">
                 Start New Pool
@@ -88,8 +62,6 @@ export default function Dashboard() {
             </Link>
           </CardContent>
         </Card>
-
-        {/* More sections later */}
       </div>
     </div>
   );
