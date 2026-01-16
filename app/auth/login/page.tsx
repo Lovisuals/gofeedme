@@ -8,16 +8,18 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import Link from 'next/link';
+import { Eye, EyeOff } from 'lucide-react';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  const handleLogin = async (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
     setLoading(true);
     setError(null);
 
@@ -26,25 +28,26 @@ export default function LoginPage() {
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     );
 
-    const { data, error } = await supabase.auth.signInWithPassword({
+    const { data: { user }, error: signInError } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
 
-    setLoading(false);
-
-    if (error) {
-      if (error.message.includes('Invalid login credentials')) {
-        setError('Invalid email or password');
-      } else if (error.message.includes('not found') || error.message.includes('not registered')) {
-        setError('Email not registered. Sign up below!');
-      } else {
-        setError(error.message);
-      }
+    if (signInError) {
+      setError(signInError.message || 'Login failed');
+      setLoading(false);
       return;
     }
 
-    router.push('/');
+    // Force session check
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) {
+      router.push('/');
+    } else {
+      setError('Session not created. Try again.');
+    }
+
+    setLoading(false);
   };
 
   return (
@@ -59,9 +62,22 @@ export default function LoginPage() {
               <Label htmlFor="email">Email</Label>
               <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
             </div>
-            <div>
+            <div className="relative">
               <Label htmlFor="password">Password</Label>
-              <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+              <Input
+                id="password"
+                type={showPassword ? 'text' : 'password'}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-9 text-gray-500"
+              >
+                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+              </button>
             </div>
 
             {error && <p className="text-red-600 text-sm text-center">{error}</p>}
@@ -72,8 +88,13 @@ export default function LoginPage() {
 
             <div className="text-center text-sm text-gray-600 mt-4">
               Don't have an account?{' '}
-              <Link href="/auth/signup" className="text-primary hover:underline">
+              <Link href="/auth/sign-up" className="text-primary hover:underline">
                 Sign Up
+              </Link>
+            </div>
+            <div className="text-center text-sm text-gray-600 mt-2">
+              <Link href="/auth/forgot-password" className="text-primary hover:underline">
+                Forgot password?
               </Link>
             </div>
           </form>
