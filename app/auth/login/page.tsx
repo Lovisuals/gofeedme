@@ -1,8 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { createClient } from '@supabase/supabase-js';
-import { useRouter } from 'next/navigation';
+import { loginAction } from './actions/auth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -10,46 +9,20 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import Link from 'next/link';
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (formData: FormData) => {
     setLoading(true);
     setError(null);
 
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    );
-
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-    if (error) {
-      setError(error.message || 'Login failed');
-      setLoading(false);
-      return;
-    }
-
-    // Wait and confirm session
-    await new Promise(r => setTimeout(r, 800));
-
-    const { data: { session } } = await supabase.auth.getSession();
-
-    if (session) {
-      console.log('Session created:', session);
-      router.push('/');
-    } else {
-      setError('Login succeeded but session not set. Try again.');
-    }
+    const result = await loginAction(formData);
 
     setLoading(false);
+
+    if (result?.error) {
+      setError(result.error);
+    }
   };
 
   return (
@@ -59,14 +32,14 @@ export default function LoginPage() {
           <CardTitle className="text-2xl text-center">Sign In to GoFeedMe</CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleLogin} className="space-y-4">
+          <form action={handleSubmit} className="space-y-4">
             <div>
               <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+              <Input id="email" name="email" type="email" required />
             </div>
             <div>
               <Label htmlFor="password">Password</Label>
-              <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+              <Input id="password" name="password" type="password" required />
             </div>
 
             {error && <p className="text-red-600 text-sm text-center">{error}</p>}
