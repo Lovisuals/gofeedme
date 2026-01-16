@@ -33,7 +33,7 @@ export async function createPool(formData: FormData) {
     location: formData.get('location') as string,
     deadline: formData.get('deadline') as string,
     status: 'active',
-    creator_id: user.id,  // Automatically set creator
+    creator_id: user.id,
   };
 
   const { error } = await supabase.from('pools').insert([data]);
