@@ -1,4 +1,4 @@
-import { createReadonlySupabaseClient } from '@/lib/supabase/server';
+import { createReadonlySupabaseClient } from '@/lib/supabase/server-readonly';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { logoutAction } from '@/app/auth/actions/auth';
