@@ -1,7 +1,7 @@
 import { createServerSupabaseClient } from '@/lib/supabase/server';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import LogoutForm from './LogoutForm';
+import { logoutAction } from './LogoutForm';
 
 export default async function Navbar() {
   const supabase = await createServerSupabaseClient();
@@ -27,7 +27,9 @@ export default async function Navbar() {
               className="w-64 p-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary hidden md:block"
             />
             {user ? (
-              <LogoutForm />
+              <form action={logoutAction}>
+                <Button variant="outline" size="sm" type="submit">Logout</Button>
+              </form>
             ) : (
               <Link href="/auth/login">
                 <Button variant="outline" size="sm">Sign In</Button>
