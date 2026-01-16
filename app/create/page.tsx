@@ -102,7 +102,7 @@ export default function CreatePool() {
                 accept="image/*"
                 capture="environment"
                 {...register('image', {
-                  onChange: onImageChange,  // Merge custom preview logic here
+                  onChange: onImageChange
                 })}
               />
               {imagePreview && <img src={imagePreview} alt="Preview" className="mt-2 h-48 w-full object-cover rounded" />}
