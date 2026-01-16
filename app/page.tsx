@@ -34,18 +34,24 @@ export default async function Home() {
     <div className="min-h-screen bg-gray-50">
       <Navbar />
 
-      {/* Hero */}
-      <section className="relative pt-24 pb-16 bg-white">
-        <div className="max-w-4xl mx-auto px-6 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-            Pool Resources, Eat Better, Farm Smarter
+      {/* Hero with Vision */}
+      <section className="relative pt-32 pb-20 bg-gradient-to-b from-white to-gray-50">
+        <div className="max-w-5xl mx-auto px-6 text-center">
+          <h1 className="text-5xl md:text-6xl font-extrabold text-gray-900 mb-6 leading-tight">
+            One Plate, Many Hands.<br />
+            <span className="text-primary">Affordable Food Through Community Power</span>
           </h1>
-          <p className="text-xl text-gray-600 mb-8">
-            Join or start food & farming pools. Bulk discounts, escrow safety, community power.
+          <p className="text-xl md:text-2xl text-gray-700 mb-10 max-w-3xl mx-auto">
+            No one needs to know each other. Just pool funds, buy in bulk, save big — escrow-protected, transparent, and community-driven.
           </p>
-          <Button size="lg" className="bg-primary hover:bg-primary-hover text-white px-10 py-6 text-lg">
-            Start a Pool
-          </Button>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button size="lg" className="bg-primary hover:bg-primary-hover text-white px-10 py-6 text-lg">
+              Start a Pool
+            </Button>
+            <Button size="lg" variant="outline" className="px-10 py-6 text-lg">
+              Browse Pools
+            </Button>
+          </div>
         </div>
       </section>
 
@@ -55,18 +61,18 @@ export default async function Home() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
             <div>
               <Zap className="h-10 w-10 mx-auto mb-4 text-primary" />
-              <h3 className="font-bold text-lg text-gray-900">Fast & Easy</h3>
-              <p className="text-gray-600">Pool in minutes</p>
+              <h3 className="font-bold text-lg text-gray-900">Instant & Easy</h3>
+              <p className="text-gray-600">Pool in minutes, pay securely</p>
             </div>
             <div>
               <ShieldCheck className="h-10 w-10 mx-auto mb-4 text-primary" />
-              <h3 className="font-bold text-lg text-gray-900">Guaranteed Safe</h3>
-              <p className="text-gray-600">Escrow holds funds</p>
+              <h3 className="font-bold text-lg text-gray-900">Escrow Protected</h3>
+              <p className="text-gray-600">Funds held until delivery</p>
             </div>
             <div>
               <Users className="h-10 w-10 mx-auto mb-4 text-primary" />
               <h3 className="font-bold text-lg text-gray-900">Community Powered</h3>
-              <p className="text-gray-600">Verified participants</p>
+              <p className="text-gray-600">Anyone can join, no barriers</p>
             </div>
           </div>
         </div>
@@ -75,7 +81,7 @@ export default async function Home() {
       {/* Category Rings */}
       <section className="py-16 bg-gray-50">
         <div className="max-w-6xl mx-auto px-6">
-          <h2 className="text-3xl font-bold text-center mb-12 text-gray-900">Discover by Category</h2>
+          <h2 className="text-3xl font-bold text-center mb-12 text-gray-900">Shop by Category</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {[
               { icon: Wheat, title: 'Staples' },
