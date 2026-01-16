@@ -9,7 +9,7 @@ const loginSchema = z.object({
   password: z.string().min(1, 'Password required'),
 });
 
-export async function loginAction(formData: FormData) {
+export async function loginAction(prevState: any, formData: FormData) {
   const parsed = loginSchema.safeParse({
     email: formData.get('email'),
     password: formData.get('password'),

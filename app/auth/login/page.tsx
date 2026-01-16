@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useFormState } from 'react-dom';
 import { loginAction } from './actions/auth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,14 +11,7 @@ import { Eye, EyeOff } from 'lucide-react';
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const handleSubmit = async (formData: FormData) => {
-    const result = await loginAction(formData);
-    if (result?.error) {
-      setError(result.error);
-    }
-  };
+  const [state, formAction] = useFormState(loginAction, { error: null });
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
@@ -27,7 +20,7 @@ export default function LoginPage() {
           <CardTitle className="text-2xl text-center">Sign In to GoFeedMe</CardTitle>
         </CardHeader>
         <CardContent>
-          <form action={handleSubmit} className="space-y-4">
+          <form action={formAction} className="space-y-4">
             <div>
               <Label htmlFor="email">Email</Label>
               <Input id="email" name="email" type="email" required />
@@ -42,14 +35,16 @@ export default function LoginPage() {
               />
               <button
                 type="button"
-                onClick={() => setShowPassword(!showPassword)}
+                onClick={() => setShowPassword(v => !v)}
                 className="absolute right-3 top-9 text-gray-500"
               >
                 {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
               </button>
             </div>
 
-            {error && <p className="text-red-600 text-sm text-center">{error}</p>}
+            {state?.error && (
+              <p className="text-red-600 text-sm text-center">{state.error}</p>
+            )}
 
             <Button type="submit" className="w-full bg-primary hover:bg-primary-hover">
               Sign In
