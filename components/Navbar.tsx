@@ -1,86 +1,39 @@
-'use client';
-
-import Link from 'next/link';
-import { Search, HeartHandshake } from 'lucide-react';
-import { createBrowserClient } from '@supabase/ssr';
-import { useEffect, useState } from 'react';
+import { createServerSupabaseClient } from '@/lib/supabase/server';
 import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
-export default function Navbar() {
-  const [user, setUser] = useState<any>(null);
-  const [supabaseClient, setSupabaseClient] = useState<any>(null);
-  const [loadError, setLoadError] = useState<string | null>(null);
+export default async function Navbar() {
+  const supabase = await createServerSupabaseClient();
+  const { data: { user } } = await supabase.auth.getUser();
 
-  useEffect(() => {
-    try {
-      if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-        throw new Error('Missing Supabase environment variables');
-      }
-
-      const client = createBrowserClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-      );
-      setSupabaseClient(client);
-
-      const fetchUser = async () => {
-        const { data } = await client.auth.getUser();
-        setUser(data.user);
-      };
-      fetchUser();
-    } catch (err: any) {
-      console.error('Navbar init error:', err);
-      setLoadError(err.message || 'Failed to initialize auth');
-    }
-  }, []);
-
-  if (loadError) {
-    return (
-      <nav className="bg-white fixed top-0 left-0 right-0 z-50 border-b border-red-200">
-        <div className="max-w-7xl mx-auto px-4 h-16 flex items-center text-red-600">
-          GoFeedMe – Error: {loadError} (check console & env vars)
-        </div>
-      </nav>
-    );
-  }
-
-  if (!supabaseClient) {
-    return null; // Loading state
-  }
+  const handleLogout = async () => {
+    'use server';
+    const supabase = await createServerSupabaseClient();
+    await supabase.auth.signOut();
+    redirect('/');
+  };
 
   return (
-    <nav className="bg-white/95 backdrop-blur-sm fixed top-0 left-0 right-0 z-50 border-b border-gray-100">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2">
-          <HeartHandshake className="h-8 w-8 text-primary" />
-          <span className="text-xl font-bold tracking-tight text-gray-text">
-            GoFeedMe
-          </span>
+    <nav className="fixed top-0 w-full bg-white border-b z-50">
+      <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+        <Link href="/">
+          <h1 className="text-2xl font-bold text-primary">GoFeedMe</h1>
         </Link>
 
-        <div className="hidden md:flex flex-1 max-w-md mx-8 relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-          <input
-            type="text"
-            placeholder="Search food pools..."
-            className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all"
-          />
-        </div>
-
         <div className="flex items-center gap-4">
+          <input type="search" placeholder="Search pools..." className="p-2 border rounded hidden md:block" />
           {user ? (
-            <Link href="/protected" className="text-sm font-medium text-gray-600 hover:text-gray-900">
-              Dashboard
-            </Link>
+            <form action={handleLogout}>
+              <Button variant="outline">Logout</Button>
+            </form>
           ) : (
-            <Link href="/auth/login" className="text-sm font-medium text-gray-600 hover:text-gray-900">
-              Sign in
+            <Link href="/auth/login">
+              <Button variant="outline">Sign In</Button>
             </Link>
           )}
-
-          <Button asChild className="bg-primary hover:bg-primary-hover text-white">
-            <Link href="/create">Start a Pool</Link>
-          </Button>
+          <Link href="/create">
+            <Button className="bg-primary hover:bg-primary-hover">Start a Pool</Button>
+          </Link>
         </div>
       </div>
     </nav>
