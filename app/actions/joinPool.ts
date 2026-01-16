@@ -1,17 +1,50 @@
 'use server';
 
-import { createServerSupabaseClient } from '@/lib/supabase/server';
+import { createServerClient } from '@supabase/ssr';
+import { cookies } from 'next/headers';
+import { revalidatePath } from 'next/cache';
 
 export async function joinPoolAction(poolId: string) {
-  const supabase = await createServerSupabaseClient();
+  const cookieStore = await cookies();
 
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        get(name) {
+          return cookieStore.get(name)?.value;
+        },
+        set(name, value, options) {
+          cookieStore.set({ name, value, ...options });
+        },
+        remove(name, options) {
+          cookieStore.delete({ name, ...options });
+        },
+      },
+    }
+  );
+
+  // Get current user
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
     return { error: 'You must be signed in to join a pool' };
   }
 
-  // Check pool exists and is not full
+  // Check if user already joined this pool
+  const { data: existingJoin } = await supabase
+    .from('pool_participants')
+    .select('id')
+    .eq('pool_id', poolId)
+    .eq('user_id', user.id)
+    .single();
+
+  if (existingJoin) {
+    return { error: 'You have already joined this pool' };
+  }
+
+  // Get current pool state
   const { data: pool, error: poolError } = await supabase
     .from('pools')
     .select('slots_total, slots_filled')
@@ -27,15 +60,37 @@ export async function joinPoolAction(poolId: string) {
   }
 
   // Increment slots_filled
-  const { error } = await supabase
+  const { error: updateError } = await supabase
     .from('pools')
     .update({ slots_filled: pool.slots_filled + 1 })
     .eq('id', poolId);
 
-  if (error) {
-    console.error('Join pool error:', error);
+  if (updateError) {
+    console.error('Join update error:', updateError);
     return { error: 'Failed to join pool' };
   }
 
-  return { success: true };
+  // Record participant (for future duplicate check + participant list)
+  const { error: participantError } = await supabase
+    .from('pool_participants')
+    .insert({
+      pool_id: poolId,
+      user_id: user.id,
+      joined_at: new Date().toISOString(),
+    });
+
+  if (participantError) {
+    console.error('Participant insert error:', participantError);
+    // Rollback slots if participant record fails (optional but good practice)
+    await supabase
+      .from('pools')
+      .update({ slots_filled: pool.slots_filled })
+      .eq('id', poolId);
+    return { error: 'Failed to record participation' };
+  }
+
+  // Revalidate home page cache
+  revalidatePath('/');
+
+  return { success: true, message: 'Joined pool successfully!' };
 }

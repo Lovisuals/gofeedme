@@ -15,15 +15,22 @@ interface JoinPoolModalProps {
 export default function JoinPoolModal({ pool, isLoggedIn }: JoinPoolModalProps) {
   const [open, setOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
 
   const handleJoin = async () => {
+    setError(null);
+    setSuccess(null);
+
     const result = await joinPoolAction(pool.id);
 
     if (result?.error) {
       setError(result.error);
-    } else {
-      setOpen(false);
-      window.location.reload(); // Refresh to show updated slots
+    } else if (result?.success) {
+      setSuccess(result.message);
+      setTimeout(() => {
+        setOpen(false);
+        window.location.reload(); // Refresh to show updated slots/raised
+      }, 1500);
     }
   };
 
@@ -48,10 +55,15 @@ export default function JoinPoolModal({ pool, isLoggedIn }: JoinPoolModalProps) 
 
             {isLoggedIn ? (
               <>
-                <Button onClick={handleJoin} className="w-full bg-primary hover:bg-primary-hover" disabled={pool.slotsFilled >= pool.slotsTotal}>
+                <Button 
+                  onClick={handleJoin} 
+                  className="w-full bg-primary hover:bg-primary-hover" 
+                  disabled={pool.slotsFilled >= pool.slotsTotal}
+                >
                   Confirm & Pay Now
                 </Button>
                 {error && <p className="text-red-600 text-sm text-center">{error}</p>}
+                {success && <p className="text-green-600 text-sm text-center">{success}</p>}
               </>
             ) : (
               <div className="text-center">
