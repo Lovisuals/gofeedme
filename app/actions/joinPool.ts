@@ -5,10 +5,11 @@ import { cookies, headers } from 'next/headers';
 import { revalidatePath } from 'next/cache';
 
 export async function joinPoolAction(poolId: string) {
-  const cookieStore = cookies();
+  // Await cookies — required in server actions
+  const cookieStore = await cookies();
+
   const headerList = headers();
 
-  // Forward all cookies from the request
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -18,14 +19,12 @@ export async function joinPoolAction(poolId: string) {
           return cookieStore.get(name)?.value;
         },
         set(name, value, options) {
-          // Server actions can set cookies
           cookieStore.set({ name, value, ...options });
         },
         remove(name, options) {
           cookieStore.delete({ name, ...options });
         },
       },
-      // Pass full headers (including cookie header)
       global: {
         headers: headerList,
       },
@@ -77,7 +76,7 @@ export async function joinPoolAction(poolId: string) {
     return { error: 'Failed to join pool' };
   }
 
-  // Record participant - force user_id
+  // Record participant
   const { error: participantError } = await supabase
     .from('pool_participants')
     .insert({
@@ -87,7 +86,7 @@ export async function joinPoolAction(poolId: string) {
     });
 
   if (participantError) {
-    console.error('Participant insert failed:', participantError.message);
+    console.error('Participant insert failed:', participantError.message, participantError.details, participantError.hint);
     await supabase
       .from('pools')
       .update({ slots_filled: pool.slots_filled })
