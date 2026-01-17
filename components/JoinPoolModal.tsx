@@ -31,11 +31,10 @@ export default function JoinPoolModal({ pool, isLoggedIn }: JoinPoolModalProps) 
       setError(result.error);
     } else if (result?.success) {
       setSuccess(result.message);
-      // Close modal and refresh page after short delay
       setTimeout(() => {
         setOpen(false);
-        window.location.reload();
-      }, 1800);
+        window.location.reload(); // Refresh to update UI
+      }, 1500);
     }
   };
 
@@ -44,7 +43,7 @@ export default function JoinPoolModal({ pool, isLoggedIn }: JoinPoolModalProps) 
       <DialogTrigger asChild>
         <Button 
           variant="secondary" 
-          className="bg-primary text-white hover:bg-primary-hover"
+          className="bg-primary text-white hover:bg-primary-hover w-full"
           disabled={pool.slotsFilled >= pool.slotsTotal}
         >
           Join Pool
@@ -65,7 +64,7 @@ export default function JoinPoolModal({ pool, isLoggedIn }: JoinPoolModalProps) 
             {isLoggedIn ? (
               <>
                 <Button 
-                  onClick={handleJoin} 
+                  onClick={handleJoin}
                   className="w-full bg-primary hover:bg-primary-hover"
                   disabled={loading || pool.slotsFilled >= pool.slotsTotal}
                 >
@@ -85,7 +84,7 @@ export default function JoinPoolModal({ pool, isLoggedIn }: JoinPoolModalProps) 
               </div>
             )}
 
-            <p className="text-sm text-gray-500 text-center italic">
+            <p className="text-sm text-gray-500 text-center">
               Payment commits you to the pool goal. No spam — commitment required.
             </p>
           </CardContent>

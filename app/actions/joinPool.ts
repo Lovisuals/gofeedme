@@ -25,14 +25,13 @@ export async function joinPoolAction(poolId: string) {
     }
   );
 
-  // Get current authenticated user
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
     return { error: 'You must be signed in to join a pool' };
   }
 
-  // Check if user already joined this pool
+  // Check if user already joined
   const { data: existing } = await supabase
     .from('pool_participants')
     .select('id')
@@ -44,19 +43,19 @@ export async function joinPoolAction(poolId: string) {
     return { error: 'You have already joined this pool' };
   }
 
-  // Get current pool state (with lock)
-  const { data: pool, error: fetchError } = await supabase
+  // Get pool
+  const { data: pool, error: poolError } = await supabase
     .from('pools')
     .select('slots_total, slots_filled')
     .eq('id', poolId)
     .single();
 
-  if (fetchError || !pool) {
+  if (poolError || !pool) {
     return { error: 'Pool not found' };
   }
 
   if (pool.slots_filled >= pool.slots_total) {
-    return { error: 'This pool is already full' };
+    return { error: 'Pool is full' };
   }
 
   // Increment slots_filled
@@ -66,11 +65,10 @@ export async function joinPoolAction(poolId: string) {
     .eq('id', poolId);
 
   if (updateError) {
-    console.error('Update slots_filled failed:', updateError);
-    return { error: 'Failed to join pool – please try again' };
+    return { error: 'Failed to join pool' };
   }
 
-  // Record the participant (for future duplicate prevention + participant list)
+  // Record participant
   const { error: participantError } = await supabase
     .from('pool_participants')
     .insert({
@@ -80,17 +78,15 @@ export async function joinPoolAction(poolId: string) {
     });
 
   if (participantError) {
-    console.error('Participant record failed:', participantError);
-    // Optional: rollback slots_filled (best effort)
+    // Rollback on failure
     await supabase
       .from('pools')
       .update({ slots_filled: pool.slots_filled })
       .eq('id', poolId);
-    return { error: 'Failed to record your participation' };
+    return { error: 'Failed to record participation' };
   }
 
-  // Revalidate home page cache so updated slots show immediately
   revalidatePath('/');
 
-  return { success: true, message: 'Joined successfully! 🎉' };
+  return { success: true, message: 'Joined successfully!' };
 }
