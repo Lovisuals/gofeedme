@@ -14,30 +14,39 @@ interface JoinPoolModalProps {
 
 export default function JoinPoolModal({ pool, isLoggedIn }: JoinPoolModalProps) {
   const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
   const handleJoin = async () => {
+    setLoading(true);
     setError(null);
     setSuccess(null);
 
     const result = await joinPoolAction(pool.id);
 
+    setLoading(false);
+
     if (result?.error) {
       setError(result.error);
     } else if (result?.success) {
       setSuccess(result.message);
+      // Close modal and refresh page after short delay
       setTimeout(() => {
         setOpen(false);
-        window.location.reload(); // Refresh to show updated slots/raised
-      }, 1500);
+        window.location.reload();
+      }, 1800);
     }
   };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="secondary" className="bg-primary text-white hover:bg-primary-hover">
+        <Button 
+          variant="secondary" 
+          className="bg-primary text-white hover:bg-primary-hover"
+          disabled={pool.slotsFilled >= pool.slotsTotal}
+        >
           Join Pool
         </Button>
       </DialogTrigger>
@@ -57,10 +66,10 @@ export default function JoinPoolModal({ pool, isLoggedIn }: JoinPoolModalProps) 
               <>
                 <Button 
                   onClick={handleJoin} 
-                  className="w-full bg-primary hover:bg-primary-hover" 
-                  disabled={pool.slotsFilled >= pool.slotsTotal}
+                  className="w-full bg-primary hover:bg-primary-hover"
+                  disabled={loading || pool.slotsFilled >= pool.slotsTotal}
                 >
-                  Confirm & Pay Now
+                  {loading ? 'Joining...' : 'Confirm & Pay Now'}
                 </Button>
                 {error && <p className="text-red-600 text-sm text-center">{error}</p>}
                 {success && <p className="text-green-600 text-sm text-center">{success}</p>}
@@ -76,7 +85,7 @@ export default function JoinPoolModal({ pool, isLoggedIn }: JoinPoolModalProps) 
               </div>
             )}
 
-            <p className="text-sm text-gray-500 text-center">
+            <p className="text-sm text-gray-500 text-center italic">
               Payment commits you to the pool goal. No spam — commitment required.
             </p>
           </CardContent>
