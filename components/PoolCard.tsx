@@ -1,6 +1,7 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { MapPin, Clock } from 'lucide-react';
-import Image from 'next/image';
+'use client';
+
+import { Button } from '@/components/ui/button';
+import JoinPoolModal from '@/components/JoinPoolModal';
 
 interface PoolCardProps {
   pool: {
@@ -17,82 +18,32 @@ interface PoolCardProps {
 }
 
 export default function PoolCard({ pool }: PoolCardProps) {
-  const percent = Math.min(Math.round((pool.slotsFilled / pool.slotsTotal) * 100), 100);
-  const pricePerSlot = Math.round(pool.total / pool.slotsTotal);
+  const progress = (pool.slotsFilled / pool.slotsTotal) * 100;
 
   return (
-    <Card className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer border border-gray-200">
-      <div className="relative h-48">
-        <Image
-          src={pool.image_url || 'https://via.placeholder.com/400x300?text=Pool'}
-          alt={pool.title}
-          fill
-          className="object-cover"
-        />
-      </div>
-      <CardHeader className="pb-2">
-        <CardTitle className="text-lg line-clamp-2">{pool.title}</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          {/* Circular Progress Ring with explicit stroke colors */}
-          <div className="flex items-center justify-between">
-            <div className="relative w-16 h-16">
-              <svg className="w-full h-full" viewBox="0 0 100 100">
-                {/* Background circle */}
-                <circle
-                  stroke="#e5e7eb"
-                  strokeWidth="8"
-                  fill="transparent"
-                  r="46"
-                  cx="50"
-                  cy="50"
-                />
-                {/* Progress circle */}
-                <circle
-                  stroke="#02a95c"
-                  strokeWidth="8"
-                  fill="transparent"
-                  r="46"
-                  cx="50"
-                  cy="50"
-                  strokeDasharray={`${percent * 2.89} 289`}
-                  strokeLinecap="round"
-                  transform="rotate(-90 50 50)"
-                />
-              </svg>
-              <div className="absolute inset-0 flex items-center justify-center text-sm font-bold text-primary">
-                {percent}%
-              </div>
-            </div>
-
-            <div className="text-right">
-              <div className="text-sm text-gray-600">Slots</div>
-              <div className="font-bold text-primary">{pool.slotsFilled}/{pool.slotsTotal}</div>
-            </div>
+    <div className="bg-white rounded-lg shadow-md overflow-hidden">
+      <img src={pool.image_url} alt={pool.title} className="w-full h-48 object-cover" />
+      <div className="p-4">
+        <h3 className="text-lg font-semibold">{pool.title}</h3>
+        <p className="text-sm text-gray-600">{pool.location}</p>
+        <div className="mt-4">
+          <div className="w-full bg-gray-200 rounded-full h-2.5">
+            <div 
+              className="bg-primary h-2.5 rounded-full" 
+              style={{ width: `${progress}%` }}
+            ></div>
           </div>
-
-          {/* Price */}
-          <div className="flex justify-between items-center">
-            <span className="text-sm text-gray-600">Per slot</span>
-            <span className="font-bold text-primary">₦{pricePerSlot.toLocaleString()}</span>
-          </div>
-
-          {/* Location, Time, Urgency */}
-          <div className="flex justify-between text-sm">
-            <div className="flex items-center gap-1 text-gray-500">
-              <MapPin className="h-4 w-4" />
-              {pool.location}
-            </div>
-            <div className="flex items-center gap-1">
-              <Clock className="h-4 w-4 text-gray-500" />
-              <span className={pool.timeLeft.includes('left') ? 'text-red-600 font-medium' : 'text-gray-500'}>
-                {pool.timeLeft}
-              </span>
-            </div>
-          </div>
+          <p className="text-sm text-gray-600 mt-1">
+            {pool.slotsFilled} / {pool.slotsTotal} joined • ₦{pool.raised.toLocaleString()} raised
+          </p>
         </div>
-      </CardContent>
-    </Card>
+        <p className="text-sm text-gray-500 mt-2">{pool.timeLeft}</p>
+
+        {/* Join Button + Modal */}
+        <div className="mt-4">
+          <JoinPoolModal pool={pool} isLoggedIn={true} /> {/* Replace with real auth check later */}
+        </div>
+      </div>
+    </div>
   );
 }
