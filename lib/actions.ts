@@ -14,6 +14,18 @@ const poolSchema = z.object({
   deadline: z.coerce.date().refine(date => date > new Date(), { message: 'Deadline must be in the future' }),
 });
 
+type Pool = {
+  id: string;
+  title: string;
+  image_url: string;
+  total: number;
+  raised: number;
+  slotsTotal: number;
+  slotsFilled: number;
+  location: string;
+  timeLeft: string;
+};
+
 export async function createPool(formData: FormData) {
   const cookieStore = await cookies();
 
@@ -35,7 +47,6 @@ export async function createPool(formData: FormData) {
     }
   );
 
-  // Get authenticated user
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
@@ -57,10 +68,9 @@ export async function createPool(formData: FormData) {
     return { error: parsed.error.issues.map(e => e.message).join(', ') };
   }
 
-  // Force creator_id server-side (critical for RLS)
   const poolData = {
     ...parsed.data,
-    creator_id: user.id,           // ← This line fixes the error
+    creator_id: user.id,
     status: 'active' as const,
   };
 
@@ -74,6 +84,59 @@ export async function createPool(formData: FormData) {
   redirect('/');
 }
 
-export async function getActivePools() {
-  // ... (your existing getActivePools code - leave it as is)
+export async function getActivePools(): Promise<Pool[]> {
+  console.log('[getActivePools] STARTED');
+
+  try {
+    const cookieStore = await cookies();
+
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          get(name) {
+            return cookieStore.get(name)?.value;
+          },
+          set(name, value, options) {
+            cookieStore.set({ name, value, ...options });
+          },
+          remove(name, options) {
+            cookieStore.delete({ name, ...options });
+          },
+        },
+      }
+    );
+
+    console.log('[getActivePools] Supabase client created');
+
+    const { data, error } = await supabase
+      .from('pools')
+      .select('*')
+      .eq('status', 'active')
+      .order('created_at', { ascending: false })
+      .limit(6);
+
+    if (error) {
+      console.error('[getActivePools] Supabase error:', error);
+      return [];
+    }
+
+    console.log('[getActivePools] Pools fetched:', data.length);
+
+    return data.map(pool => ({
+      id: pool.id,
+      title: pool.title,
+      image_url: pool.image_url || 'https://via.placeholder.com/400x300?text=Pool',
+      total: pool.total_amount,
+      raised: pool.total_amount * ((pool.slots_filled || 0) / (pool.slots_total || 1)) || 0,
+      slotsTotal: pool.slots_total || 0,
+      slotsFilled: pool.slots_filled || 0,
+      location: pool.location,
+      timeLeft: pool.deadline ? new Date(pool.deadline).toLocaleDateString() : 'Ongoing',
+    }));
+  } catch (err) {
+    console.error('[getActivePools] Crash:', err);
+    return [];
+  }
 }
