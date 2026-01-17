@@ -25,6 +25,7 @@ export async function joinPoolAction(poolId: string) {
     }
   );
 
+  // Get current user
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
@@ -43,7 +44,7 @@ export async function joinPoolAction(poolId: string) {
     return { error: 'You have already joined this pool' };
   }
 
-  // Get pool
+  // Get current pool state
   const { data: pool, error: poolError } = await supabase
     .from('pools')
     .select('slots_total, slots_filled')
@@ -65,6 +66,7 @@ export async function joinPoolAction(poolId: string) {
     .eq('id', poolId);
 
   if (updateError) {
+    console.error('Join update error:', updateError);
     return { error: 'Failed to join pool' };
   }
 
@@ -88,5 +90,5 @@ export async function joinPoolAction(poolId: string) {
 
   revalidatePath('/');
 
-  return { success: true, message: 'Joined successfully!' };
+  return { success: true, message: 'Joined successfully! 🎉' };
 }
