@@ -5,7 +5,6 @@ import { cookies, headers } from 'next/headers';
 import { revalidatePath } from 'next/cache';
 
 export async function joinPoolAction(poolId: string) {
-  // Await cookies — required in server actions
   const cookieStore = await cookies();
 
   const headerList = headers();
@@ -26,7 +25,7 @@ export async function joinPoolAction(poolId: string) {
         },
       },
       global: {
-        headers: headerList,
+        headers: Object.fromEntries(headerList.entries()),  // ← FIX: convert Headers to plain object
       },
     }
   );
