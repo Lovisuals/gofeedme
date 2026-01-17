@@ -6,8 +6,7 @@ import { revalidatePath } from 'next/cache';
 
 export async function joinPoolAction(poolId: string) {
   const cookieStore = await cookies();
-
-  const headerList = headers();
+  const headerList = await headers();  // ← FIXED: await headers()
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -25,7 +24,7 @@ export async function joinPoolAction(poolId: string) {
         },
       },
       global: {
-        headers: Object.fromEntries(headerList.entries()),  // ← FIX: convert Headers to plain object
+        headers: Object.fromEntries(headerList.entries()),  // now safe
       },
     }
   );
